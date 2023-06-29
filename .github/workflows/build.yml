@@ -71,9 +71,12 @@ jobs:
         tag_name: ${{ steps.latest_tag.outputs.tag }}
         fail_on_unmatched_files: true
         generate_release_notes: false
-        files: |
-          mobi*.*
-          tools/mobi*.*
+        name: libmobi-release
+        path: |
+          **/*.exe
+          **/*.dll
+          **/tools/*.exe
+          **/tools/*.dll
 
     - name: make distcheck
       run: make -j$(nproc) distcheck
@@ -82,7 +85,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: ${{ failure() }}
       with:
-        name: test-logs
+        name: debug-release
         path: |
           **/*.exe
           **/*.dll
