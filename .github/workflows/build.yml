@@ -85,6 +85,8 @@ jobs:
         name: test-logs
         path: |
           **/*.exe
+          **/*.dll
           **/tools/*.exe
-          **/tests/test-suite.log
-          **/tests/samples/*.log
+          **/tools/*.dll
+          #**/tests/test-suite.log
+          #**/tests/samples/*.log
