@@ -64,17 +64,16 @@ jobs:
       
     - name: Upload release
       uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # if: startsWith(github.ref, 'refs/tags/')
       with:
         tag_name: ${{ steps.latest_tag.outputs.tag }}
         fail_on_unmatched_files: true
         generate_release_notes: false
         files: |
-          mobidrm.exe
-          mobimeta.exe
-          mobitool.exe
-          /d/a/libmobi/libmobi/mobitool.exe
-          /d/a/libmobi/libmobi/README.md
+          *
+          libmobi/*
 
     - name: make distcheck
       run: make -j$(nproc) distcheck
