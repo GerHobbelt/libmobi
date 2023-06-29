@@ -56,27 +56,25 @@ jobs:
     - name: Echo latest tag
       run: echo '${{ steps.latest_tag.outputs.tag }}'
       
-    - name: List results-1
-      run:  ls -R |awk '{print i$0}' i=`pwd`'/'
     - name: make check
       run: make -j$(nproc) check
-    - name: List results-2
+      
+    - name: List results
       run:  ls -R |awk '{print i$0}' i=`pwd`'/'
-    - name: make distcheck
-      run: make -j$(nproc) distcheck
-    - name: List results-3
-      run: ls -lah 
+      
     - name: Upload release
       uses: softprops/action-gh-release@v1
       # if: startsWith(github.ref, 'refs/tags/')
       with:
         tag_name: ${{ steps.latest_tag.outputs.tag }}
         fail_on_unmatched_files: true
-        generate_release_notes: true
+        generate_release_notes: false
         files: |
-          *.zip
           *.exe
-          *.dll
+
+    - name: make distcheck
+      run: make -j$(nproc) distcheck
+
     - name: upload debug artifacts
       uses: actions/upload-artifact@v2
       if: ${{ failure() }}
