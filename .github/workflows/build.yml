@@ -70,7 +70,9 @@ jobs:
         fail_on_unmatched_files: true
         generate_release_notes: false
         files: |
-          *.exe
+          mobidrm.exe
+          mobimeta.exe
+          mobitool.exe
 
     - name: make distcheck
       run: make -j$(nproc) distcheck
