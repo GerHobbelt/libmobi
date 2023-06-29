@@ -40,6 +40,18 @@ jobs:
       run: make -j$(nproc) check
     - name: make distcheck
       run: make -j$(nproc) distcheck
+    - name: List results
+      run: ls -lah 
+    - name: Upload release
+      uses: softprops/action-gh-release@v1
+      # if: startsWith(github.ref, 'refs/tags/')
+      with:
+        tag_name: ${{ steps.latest_tag.outputs.tag }}
+        fail_on_unmatched_files: true
+        generate_release_notes: true
+        files: |
+          *.zip
+          *.exe
     - name: upload debug artifacts
       uses: actions/upload-artifact@v2
       if: ${{ failure() }}
