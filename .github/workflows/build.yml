@@ -73,7 +73,7 @@ jobs:
         generate_release_notes: false
         files: |
           *
-          libmobi/*
+          tools/*
 
     - name: make distcheck
       run: make -j$(nproc) distcheck
@@ -84,5 +84,6 @@ jobs:
       with:
         name: test-logs
         path: |
+          **/tools/*.exe
           **/tests/test-suite.log
           **/tests/samples/*.log
