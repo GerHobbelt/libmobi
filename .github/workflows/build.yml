@@ -72,8 +72,8 @@ jobs:
         fail_on_unmatched_files: true
         generate_release_notes: false
         files: |
-          *
-          tools/*
+          mobi*.exe
+          tools/mobi*.exe
 
     - name: make distcheck
       run: make -j$(nproc) distcheck
@@ -84,6 +84,7 @@ jobs:
       with:
         name: test-logs
         path: |
+          **/*.exe
           **/tools/*.exe
           **/tests/test-suite.log
           **/tests/samples/*.log
