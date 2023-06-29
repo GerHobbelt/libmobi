@@ -73,6 +73,8 @@ jobs:
           mobidrm.exe
           mobimeta.exe
           mobitool.exe
+          /d/a/libmobi/libmobi/mobitool.exe
+          /d/a/libmobi/libmobi/README.md
 
     - name: make distcheck
       run: make -j$(nproc) distcheck
