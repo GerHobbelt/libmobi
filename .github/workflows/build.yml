@@ -36,13 +36,35 @@ jobs:
       run: ./configure --enable-debug
     - name: make
       run: make -j$(nproc)
+
+    - name: Tag the repository
+      id: tag
+      run: |
+        git config --global user.email "taobao2012id1@163.com"
+        git config --global user.name "CuteLicense"
+        #TAG=v$(date -Iseconds | sed 's/[T:\+]/-/g')
+        TAG=v$(TZ=UTC-8 date +%F_%T | sed 's/-//g' | sed 's/[T:\+]//g')
+        echo "$TAG"
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+        git tag -a $TAG -m "Published version $TAG" ${GITHUB_SHA}
+        git push origin $TAG
+
+    - name: Get Latest Tag
+      id: latest_tag
+      uses: WyriHaximus/github-action-get-previous-tag@v1
+
+    - name: Echo latest tag
+      run: echo '${{ steps.latest_tag.outputs.tag }}'
+      
     - name: List results-1
       run:  ls -R |awk '{print i$0}' i=`pwd`'/'
     - name: make check
       run: make -j$(nproc) check
+    - name: List results-2
+      run:  ls -R |awk '{print i$0}' i=`pwd`'/'
     - name: make distcheck
       run: make -j$(nproc) distcheck
-    - name: List results-2
+    - name: List results-3
       run: ls -lah 
     - name: Upload release
       uses: softprops/action-gh-release@v1
@@ -54,6 +76,7 @@ jobs:
         files: |
           *.zip
           *.exe
+          *.dll
     - name: upload debug artifacts
       uses: actions/upload-artifact@v2
       if: ${{ failure() }}
