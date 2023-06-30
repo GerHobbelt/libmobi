@@ -73,9 +73,9 @@ jobs:
 
     - name: Zip Files
       uses: vimtor/action-zip@v1
-        with:
-          files: release/
-          dest: ${{ steps.latest_tag.outputs.tag }}.zip
+      with:
+        files: release/
+        dest: ${{ steps.latest_tag.outputs.tag }}.zip
 
     - name: List results
       run:  ls -R |awk '{print i$0}' i=`pwd`'/'
