@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
-#include <windows.h>
 #include <errno.h>
 /* include libmobi header */
 #include <mobi.h>
