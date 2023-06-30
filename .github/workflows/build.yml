@@ -62,9 +62,15 @@ jobs:
     - name: make distcheck
       run: make -j$(nproc) distcheck
 
+    - name: create release folder
+      run: mkdir release
+
     - name: copy dll file
-      run:  cp -RT src/.libs/ tools/
-      
+      run:  cp -RT src/.libs/ release/
+
+    - name: copy exe file
+      run:  cp -RT tools/.libs/ release/
+
     - name: List results
       run:  ls -R |awk '{print i$0}' i=`pwd`'/'
       
@@ -79,8 +85,8 @@ jobs:
         generate_release_notes: false
         name: libmobi-release
         files: |
-          **/tools/*.dll
-          **/tools/.lib/*.exe
+          **/release/*.dll
+          **/release/*.exe
 
     - name: upload debug artifacts
       uses: actions/upload-artifact@v2
