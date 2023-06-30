@@ -71,6 +71,9 @@ jobs:
     - name: copy exe files
       run:  cp -RT tools/.libs/ release/
 
+    - name: install zip
+      run:  yum install -y zip
+
     - name: zip exe and dll files
       run:  zip ${{ steps.latest_tag.outputs.tag }}.zip release/*.dll release/*.exe
 
@@ -88,6 +91,7 @@ jobs:
         generate_release_notes: false
         name: libmobi-release
         files: |
+          **/*.zip
           **/release/*.dll
           **/release/*.exe
 
