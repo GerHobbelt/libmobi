@@ -59,6 +59,9 @@ jobs:
     - name: make check
       run: make -j$(nproc) check
       
+    - name: make distcheck
+      run: make -j$(nproc) distcheck
+
     - name: List results
       run:  ls -R |awk '{print i$0}' i=`pwd`'/'
       
@@ -77,9 +80,6 @@ jobs:
           **/*.dll
           **/tools/*.exe
           **/tools/*.dll
-
-    - name: make distcheck
-      run: make -j$(nproc) distcheck
 
     - name: upload debug artifacts
       uses: actions/upload-artifact@v2
