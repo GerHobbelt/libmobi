@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
+#include <windows.h>
 #include <errno.h>
 /* include libmobi header */
 #include <mobi.h>
@@ -931,6 +932,7 @@ static void exit_with_usage(const char *progname) {
  @return SUCCESS (0) or ERROR (1)
  */
 int main(int argc, char *argv[]) {
+    SetConsoleOutputCP(65001);
     if (argc < 2) {
         exit_with_usage(argv[0]);
     }
