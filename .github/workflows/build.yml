@@ -66,10 +66,10 @@ jobs:
       run: mkdir release
 
     - name: copy dll file
-      run:  cp -RT src/.libs/ release/
+      run:  cp src/.libs/*.dll release/
 
     - name: copy exe files
-      run:  cp -RT tools/.libs/ release/
+      run:  cp tools/.libs/*.exe release/
 
     - name: Zip Files
       uses: vimtor/action-zip@v1
