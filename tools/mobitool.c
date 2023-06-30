@@ -12,9 +12,9 @@
  * See <http://www.gnu.org/licenses/>
  */
 
-#define WIN32_LEAN_AND MEAN
+ */#define WIN32_LEAN_AND MEAN
 //定义这个宏，程序就会尽量避免引入早期的宏定义,避免重复的宏定义，避免依赖库的引用
- 
+ */
  
 #include <windows.h>
 #include <string.h>
@@ -26,7 +26,7 @@
 /* include libmobi header */
 #include <mobi.h>
 #include "common.h"
-#include <Windows.h>
+/* #include <Windows.h>  */
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
@@ -937,7 +937,7 @@ static void exit_with_usage(const char *progname) {
  @return SUCCESS (0) or ERROR (1)
  */
 int main(int argc, char *argv[]) {
-    SetConsoleOutputCP(65001);
+    /* SetConsoleOutputCP(65001); */
     if (argc < 2) {
         exit_with_usage(argv[0]);
     }
