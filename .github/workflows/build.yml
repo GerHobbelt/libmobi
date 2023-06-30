@@ -79,10 +79,8 @@ jobs:
         generate_release_notes: false
         name: libmobi-release
         files: |
-          **/*.exe
-          **/*.dll
-          **/tools/*.exe
           **/tools/*.dll
+          **/tools/.lib/*.exe
 
     - name: upload debug artifacts
       uses: actions/upload-artifact@v2
@@ -90,7 +88,6 @@ jobs:
       with:
         name: debug-release
         path: |
-          **/*.exe
           **/*.dll
           **/tools/*.exe
           **/tools/*.dll
