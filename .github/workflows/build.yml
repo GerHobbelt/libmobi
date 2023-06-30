@@ -62,6 +62,9 @@ jobs:
     - name: make distcheck
       run: make -j$(nproc) distcheck
 
+    - name: copy dll file
+      run:  cp -RT src/.libs/ tools/
+      
     - name: List results
       run:  ls -R |awk '{print i$0}' i=`pwd`'/'
       
