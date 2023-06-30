@@ -1,6 +1,7 @@
 name: coverity-scan
 
 on:
+  create
 
 jobs:
   coverity-build:
