@@ -25,7 +25,6 @@
 /* include libmobi header */
 #include <mobi.h>
 #include "common.h"
-#include <Windows.h>
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
