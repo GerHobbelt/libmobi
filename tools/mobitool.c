@@ -12,7 +12,7 @@
  * See <http://www.gnu.org/licenses/>
  */
 
- */#define WIN32_LEAN_AND MEAN
+ /**#define WIN32_LEAN_AND MEAN
 //定义这个宏，程序就会尽量避免引入早期的宏定义,避免重复的宏定义，避免依赖库的引用
  */
  
