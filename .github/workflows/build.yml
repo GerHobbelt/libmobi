@@ -68,8 +68,11 @@ jobs:
     - name: copy dll file
       run:  cp -RT src/.libs/ release/
 
-    - name: copy exe file
+    - name: copy exe files
       run:  cp -RT tools/.libs/ release/
+
+    - name: zip exe and dll files
+      run:  zip ${{ steps.latest_tag.outputs.tag }}.zip release/*.dll release/*.exe
 
     - name: List results
       run:  ls -R |awk '{print i$0}' i=`pwd`'/'
