@@ -16,7 +16,6 @@
 //定义这个宏，程序就会尽量避免引入早期的宏定义,避免重复的宏定义，避免依赖库的引用
  */
  
-#include <windows.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -26,7 +25,7 @@
 /* include libmobi header */
 #include <mobi.h>
 #include "common.h"
-/* #include <Windows.h>  */
+#include <Windows.h>
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
