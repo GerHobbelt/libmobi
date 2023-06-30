@@ -1,8 +1,6 @@
 name: coverity-scan
 
 on:
-  push:
-    branches: [ public ]
 
 jobs:
   coverity-build:
