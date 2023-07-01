@@ -22,8 +22,6 @@
 #include <mobi.h>
 #include "common.h"
 
-#include <windows.h>
-
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
 # define MINIZ_HEADER_FILE_ONLY
@@ -89,15 +87,6 @@ bool setserial_opt = false;
 char *pid = NULL;
 char *serial = NULL;
 #endif
-
-void windows_cmd_support_utf8(void)
-{
-#ifdef WIN64
-    SetConsoleCP(65001);
-    SetConsoleOutputCP(65001);
-#endif
-}
-
 
 /**
  @brief Print all loaded headers meta information
@@ -943,7 +932,9 @@ static void exit_with_usage(const char *progname) {
  */
 int main(int argc, char *argv[]) {
   
-    windows_cmd_support_utf8();
+#ifdef WIN64
+    system("chcp 65001>nul");
+#endif
   
     if (argc < 2) {
         exit_with_usage(argv[0]);
