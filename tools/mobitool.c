@@ -22,6 +22,8 @@
 #include <mobi.h>
 #include "common.h"
 
+#include <locale.h>
+
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
 # define MINIZ_HEADER_FILE_ONLY
@@ -91,7 +93,7 @@ char *serial = NULL;
 void windows_cmd_support_utf8(void)
 {
 #ifdef WIN64
-    system("chcp 65001 & cls"); //cls 用来清除 chcp 的输出
+    system("chcp 65001 >nul");
 #endif
 }
 
@@ -941,6 +943,7 @@ static void exit_with_usage(const char *progname) {
 int main(int argc, char *argv[]) {
   
     windows_cmd_support_utf8();
+    setlocale(LC_ALL, "");
   
     if (argc < 2) {
         exit_with_usage(argv[0]);
