@@ -18,6 +18,9 @@
 #include <errno.h>
 #include <mobi.h>
 #include "common.h"
+#include <wchar.h>
+#include <locale.h>
+
 
 #ifdef _WIN32
 # include <direct.h>
@@ -242,6 +245,9 @@ void normalize_path(char *path) {
  @param[in] m MOBIData structure
  */
 void print_summary(const MOBIData *m) {
+#ifdef _WIN64
+    setlocale(LC_ALL, "zh_CN.UTF-8");
+#endif
     char *title = mobi_meta_get_title(m);
     if (title) {
         printf("Title: %s\n", title);
