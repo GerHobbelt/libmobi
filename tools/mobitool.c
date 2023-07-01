@@ -21,8 +21,6 @@
 /* include libmobi header */
 #include <mobi.h>
 #include "common.h"
-#include <wchar.h>
-#include <locale.h>
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
@@ -933,9 +931,6 @@ static void exit_with_usage(const char *progname) {
  @return SUCCESS (0) or ERROR (1)
  */
 int main(int argc, char *argv[]) {
-#ifdef _WIN64
-    setlocale(LC_ALL, "zh_CN.UTF-8");
-#endif
     if (argc < 2) {
         exit_with_usage(argv[0]);
     }
