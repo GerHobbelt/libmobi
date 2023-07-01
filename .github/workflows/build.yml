@@ -76,6 +76,7 @@ jobs:
       with:
         files: |
           /release/*
+          **/release/*
 
     - name: Zip Files
       uses: vimtor/action-zip@v1
