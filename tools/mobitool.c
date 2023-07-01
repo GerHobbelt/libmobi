@@ -21,6 +21,7 @@
 /* include libmobi header */
 #include <mobi.h>
 #include "common.h"
+#include <wchar.h>
 #include <locale.h>
 
 /* miniz file is needed for EPUB creation */
