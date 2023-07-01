@@ -71,6 +71,11 @@ jobs:
     - name: copy exe files
       run:  cp tools/.libs/*.exe release/
 
+    - name: Compress binaries
+      uses: svenstaro/upx-action@v2
+      with:
+        files: release/
+
     - name: Zip Files
       uses: vimtor/action-zip@v1
       with:
