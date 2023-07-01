@@ -22,6 +22,8 @@
 #include <mobi.h>
 #include "common.h"
 
+#include <windows.h>
+
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
 # define MINIZ_HEADER_FILE_ONLY
@@ -87,6 +89,24 @@ bool setserial_opt = false;
 char *pid = NULL;
 char *serial = NULL;
 #endif
+
+
+void utf8ToGbk(char *utf8String, char *gbkString)
+{
+    wchar_t *unicodeStr = NULL;
+    int nRetLen = 0;
+    nRetLen = MultiByteToWideChar(CP_UTF8, 0, utf8String, -1, NULL, 0);
+    //求需求的宽字符数大小
+    unicodeStr = (wchar_t *)malloc(nRetLen * sizeof(wchar_t));
+    nRetLen = MultiByteToWideChar(CP_UTF8, 0, utf8String, -1, unicodeStr, nRetLen);
+    //将utf-8编码转换成unicode编码
+    nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, NULL, 0, NULL, 0);
+    //求转换所需字节数
+    nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, gbkString, nRetLen, NULL, 0);
+    //unicode编码转换成gbk编码
+    free(unicodeStr);
+}
+
 
 /**
  @brief Print all loaded headers meta information
@@ -385,7 +405,14 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     if (create_path(cover_path, sizeof(cover_path), fullpath, suffix) == ERROR) {
         return ERROR;
     }
-    
+
+
+    char text[MAX_PATH]=cover_path;
+    char retText[MAX_PATH]={"\0"};
+    utf8ToGbk(text,retText);
+    printf("Saving cover to %s\n", retText);
+
+ 
     printf("Saving cover to %s\n", cover_path);
     
     return write_file(record->data, record->size, cover_path);
