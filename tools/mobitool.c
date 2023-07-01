@@ -933,7 +933,7 @@ static void exit_with_usage(const char *progname) {
  */
 int main(int argc, char *argv[]) {
 #ifdef _WIN64
-    setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "zh_CN.UTF-8");
 #endif
     if (argc < 2) {
         exit_with_usage(argv[0]);
