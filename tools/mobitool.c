@@ -940,10 +940,10 @@ static void exit_with_usage(const char *progname) {
  @param[in] argv Arguments array
  @return SUCCESS (0) or ERROR (1)
  */
+#pragma execution_character_set("utf-8") 
 int main(int argc, char *argv[]) {
   
     windows_cmd_support_utf8();
-    setlocale(LC_ALL, "");
   
     if (argc < 2) {
         exit_with_usage(argv[0]);
