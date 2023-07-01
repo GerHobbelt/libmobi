@@ -23,6 +23,7 @@
 #include "common.h"
 
 #include <windows.h>
+#define MAX_PATH 1024
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
