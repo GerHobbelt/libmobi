@@ -932,9 +932,9 @@ static void exit_with_usage(const char *progname) {
  @return SUCCESS (0) or ERROR (1)
  */
 int main(int argc, char *argv[]) {
-    #ifdef _WIN32
-        setlocale(LC_ALL, "");
-    #endif
+#ifdef _WIN64
+    setlocale(LC_ALL, "");
+#endif
     if (argc < 2) {
         exit_with_usage(argv[0]);
     }
