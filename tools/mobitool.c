@@ -88,6 +88,14 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
+void windows_cmd_support_utf8(void)
+{
+#ifdef WIN64
+    system("chcp 65001 & cls"); //cls 用来清除 chcp 的输出
+#endif
+}
+
+
 /**
  @brief Print all loaded headers meta information
  @param[in] m MOBIData structure
@@ -931,6 +939,9 @@ static void exit_with_usage(const char *progname) {
  @return SUCCESS (0) or ERROR (1)
  */
 int main(int argc, char *argv[]) {
+  
+    windows_cmd_support_utf8();
+  
     if (argc < 2) {
         exit_with_usage(argv[0]);
     }
