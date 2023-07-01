@@ -22,8 +22,6 @@
 #include <mobi.h>
 #include "common.h"
 
-#include <locale.h>
-
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
 # define MINIZ_HEADER_FILE_ONLY
@@ -93,7 +91,8 @@ char *serial = NULL;
 void windows_cmd_support_utf8(void)
 {
 #ifdef WIN64
-    system("chcp 65001 >nul");
+    SetConsoleCP(65001);
+    SetConsoleOutputCP(65001);
 #endif
 }
 
@@ -940,7 +939,6 @@ static void exit_with_usage(const char *progname) {
  @param[in] argv Arguments array
  @return SUCCESS (0) or ERROR (1)
  */
-#pragma execution_character_set("utf-8") 
 int main(int argc, char *argv[]) {
   
     windows_cmd_support_utf8();
