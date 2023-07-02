@@ -1000,13 +1000,12 @@ int main(int argc, char *argv[]) {
     system("chcp 65001>nul");
 #endif
 #ifdef _WIN32  
-  // Windows代码    
-  SetConsoleOutputCP(CP_UTF8);
+    // Windows代码    
+    SetConsoleOutputCP(CP_UTF8);
 #else
-  // Linux代码
-  setenv("LC_ALL", "zh_CN.UTF8", 1);
+    // Linux代码
+    setenv("LC_ALL", "zh_CN.UTF8", 1);
 #endif
-
 
 	
     if (argc < 2) {
