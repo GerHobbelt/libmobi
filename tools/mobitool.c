@@ -91,28 +91,42 @@ char *serial = NULL;
 #endif
 
 char *filename = NULL;
-// utf-8 to gbk
-char *utf8_to_gbk(char *utf8)
+char* UTF8_To_String(const char* pSource)
 {
-    char *gbk = (char *)malloc(sizeof(char) * (strlen(utf8) * 2 + 1));
-    iconv_t cd = iconv_open("gbk", "utf-8");
-    if (cd == (iconv_t)-1)
-    {
-        printf("iconv_open error!\n");
-        return NULL;
+    size_t i_length = strlen(pSource);
+    size_t o_length = (i_length + 1) * 2;
+    char* pmbs = (char*)malloc(o_length);
+	
+	if (pmbs == NULL)
+	{
+		printf("UTF8_To_String: Malloc str failed!");
+		return NULL;
+	}
+	
+    memset(pmbs, 0, o_length);
+    char* result = pmbs;  
+    size_t retsize;
+    iconv_t cd;
+    cd = iconv_open("GBK", "UTF-8");
+    if((iconv_t)-1 == cd) { 
+        perror("iconv_open error"); 
+        free(pmbs);
+        pmbs = NULL;
+        iconv_close(cd);
+        return NULL; 
     }
-    memset(gbk, 0, sizeof(char) * (strlen(utf8) * 2 + 1));
-    char *inbuf = utf8;
-    char *outbuf = gbk;
-    size_t inlen = strlen(utf8);
-    size_t outlen = strlen(utf8) * 2 + 1;
-    if (iconv(cd, &inbuf, &inlen, &outbuf, &outlen) == (size_t)-1)
-    {
-        printf("iconv error!\n");
-        return NULL;
+
+    retsize = iconv(cd, (char**)&pSource, &i_length, (char**)&pmbs, &o_length);
+    if((size_t)-1 == retsize) { 
+        perror("iconv error"); 
+        free(pmbs);
+        pmbs = NULL;
+        iconv_close(cd);
+        return NULL;    
     }
+
     iconv_close(cd);
-    return gbk;
+    return result;
 }
 
 
@@ -415,8 +429,8 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     }
 
     // 解决中文文件名乱码
-    filename = utf8_to_gbk(cover_path);
-    printf("Saving cover to %s\n", cover_path);
+    filename = UTF8_To_String(cover_path);
+    printf("Saving cover to %s\n", filename);
  
     printf("Saving cover to %s\n", cover_path);
     
