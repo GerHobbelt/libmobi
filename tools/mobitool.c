@@ -92,7 +92,8 @@ void utf8_to_gbk(const char *utf8, char *gbk)
 {
     size_t i = 0;
     while (utf8[i]) {
-        if (utf8[i] < 0x80) {
+	int valor = utf8[i];
+	if (valor < 0x80) {
             // ASCII character, copy directly
             gbk[i] = utf8[i];
         } else {
