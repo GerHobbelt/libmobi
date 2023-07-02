@@ -22,13 +22,6 @@
 #include <mobi.h>
 #include "common.h"
 
-
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-#define MAX_PATH 1024
-
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
 # define MINIZ_HEADER_FILE_ONLY
@@ -95,21 +88,29 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
-
-void utf8ToGbk(char *utf8String, char *gbkString)
+char *filename = NULL;
+// utf-8 to gbk
+char *utf8_to_gbk(char *utf8)
 {
-    wchar_t *unicodeStr = NULL;
-    int nRetLen = 0;
-    nRetLen = MultiByteToWideChar(CP_UTF8, 0, utf8String, -1, NULL, 0);
-    //求需求的宽字符数大小
-    unicodeStr = (wchar_t *)malloc(nRetLen * sizeof(wchar_t));
-    nRetLen = MultiByteToWideChar(CP_UTF8, 0, utf8String, -1, unicodeStr, nRetLen);
-    //将utf-8编码转换成unicode编码
-    nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, NULL, 0, NULL, 0);
-    //求转换所需字节数
-    nRetLen = WideCharToMultiByte(CP_ACP, 0, unicodeStr, -1, gbkString, nRetLen, NULL, 0);
-    //unicode编码转换成gbk编码
-    free(unicodeStr);
+    char *gbk = (char *)malloc(sizeof(char) * (strlen(utf8) * 2 + 1));
+    iconv_t cd = iconv_open("gbk", "utf-8");
+    if (cd == (iconv_t)-1)
+    {
+        printf("iconv_open error!\n");
+        return NULL;
+    }
+    memset(gbk, 0, sizeof(char) * (strlen(utf8) * 2 + 1));
+    char *inbuf = utf8;
+    char *outbuf = gbk;
+    size_t inlen = strlen(utf8);
+    size_t outlen = strlen(utf8) * 2 + 1;
+    if (iconv(cd, &inbuf, &inlen, &outbuf, &outlen) == (size_t)-1)
+    {
+        printf("iconv error!\n");
+        return NULL;
+    }
+    iconv_close(cd);
+    return gbk;
 }
 
 
@@ -411,12 +412,9 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
         return ERROR;
     }
 
-
-    char text[MAX_PATH]=cover_path;
-    char retText[MAX_PATH]={"\0"};
-    utf8ToGbk(text,retText);
-    printf("Saving cover to %s\n", retText);
-
+    // 解决中文文件名乱码
+    filename = utf8_to_gbk(cover_path);
+    printf("Saving cover to %s\n", cover_path);
  
     printf("Saving cover to %s\n", cover_path);
     
