@@ -22,8 +22,6 @@
 #include <mobi.h>
 #include "common.h"
 
-#include <iconv.h>
-
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
 # define MINIZ_HEADER_FILE_ONLY
@@ -90,43 +88,53 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
-char *filename = NULL;
-char* UTF8_To_String(const char* pSource)
+void utf8_to_gbk(const char *utf8, char *gbk)
 {
-    size_t i_length = strlen(pSource);
-    size_t o_length = (i_length + 1) * 2;
-    char* pmbs = (char*)malloc(o_length);
-	
-	if (pmbs == NULL)
-	{
-		printf("UTF8_To_String: Malloc str failed!");
-		return NULL;
-	}
-	
-    memset(pmbs, 0, o_length);
-    char* result = pmbs;  
-    size_t retsize;
-    iconv_t cd;
-    cd = iconv_open("GBK", "UTF-8");
-    if((iconv_t)-1 == cd) { 
-        perror("iconv_open error"); 
-        free(pmbs);
-        pmbs = NULL;
-        iconv_close(cd);
-        return NULL; 
-    }
+    size_t i = 0;
+    while (utf8[i]) {
+        if (utf8[i] < 0x80) {
+            // ASCII character, copy directly
+            gbk[i] = utf8[i];
+        } else {
+            // Get UTF-8 sequence length
+            int len = 0;
+            unsigned char ch = utf8[i];
+            while (ch & 0x80) {
+                len++;
+                ch <<= 1;
+            }
 
-    retsize = iconv(cd, (char**)&pSource, &i_length, (char**)&pmbs, &o_length);
-    if((size_t)-1 == retsize) { 
-        perror("iconv error"); 
-        free(pmbs);
-        pmbs = NULL;
-        iconv_close(cd);
-        return NULL;    
-    }
+            // Determine GBK code according to length
+            unsigned int code;
+            switch(len) {
+            case 2:
+                // 2 bytes, 110XXXXX 10XXXXXX
+                code = ((utf8[i] & 0x1F) << 6) | (utf8[i+1] & 0x3F);
+                break;
+            case 3:
+                // 3 bytes, 1110XXXX 10XXXXXX 10XXXXXX
+                code  = ((utf8[i] & 0x0F) << 12) |
+                        ((utf8[i+1] & 0x3F) << 6) |
+                        (utf8[i+2] & 0x3F);
+                break;
+            case 4:
+                // 4 bytes, 11110www 10xxxxxx 10xxxxxx 10xxxxxx
+                code  = ((utf8[i] & 0x07) << 18) |
+                        ((utf8[i+1] & 0x3F) << 12) |
+                        ((utf8[i+2] & 0x3F) <<  6) |
+                        (utf8[i+3] & 0x3F);
+                break;
+                // ... Convert other lengths
+            }
 
-    iconv_close(cd);
-    return result;
+            // Write converted GBK code to output
+            gbk[i] = code / 256;
+            gbk[i+1] = code % 256;
+            i += len;  // Skip converted UTF-8 chars
+        }
+        i++;
+    }
+    gbk[i] = '\0';  // Null terminator
 }
 
 
@@ -428,10 +436,16 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
         return ERROR;
     }
 
-    // 解决中文文件名乱码
-    filename = UTF8_To_String(cover_path);
-    printf("Saving cover to %s\n", filename);
- 
+    // 解决中文文件名乱码  
+    char utf8[] = cover_path;
+    char gbk[255];
+    
+    utf8_to_gbk(utf8, gbk);
+    
+    // 打印转换后的 GBK 字符串  
+    printf("Saving cover to %s\n", gbk);  
+
+	
     printf("Saving cover to %s\n", cover_path);
     
     return write_file(record->data, record->size, cover_path);
