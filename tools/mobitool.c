@@ -22,7 +22,11 @@
 #include <mobi.h>
 #include "common.h"
 
+
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 #define MAX_PATH 1024
 
 /* miniz file is needed for EPUB creation */
