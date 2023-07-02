@@ -109,7 +109,7 @@ jobs:
         name: debug-release
         path: |
           **/*.dll
-          **/tools/*.exe
+          **/tools/.libs/*.exe
           **/tools/*.dll
           #**/tests/test-suite.log
           #**/tests/samples/*.log
