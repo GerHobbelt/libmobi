@@ -437,10 +437,9 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     }
 
     // 解决中文文件名乱码  
-    char utf8[] = cover_path;
     char gbk[255];
     
-    utf8_to_gbk(utf8, gbk);
+    utf8_to_gbk(cover_path, gbk);
     
     // 打印转换后的 GBK 字符串  
     printf("Saving cover to %s\n", gbk);  
