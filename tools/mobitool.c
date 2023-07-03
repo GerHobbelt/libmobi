@@ -96,7 +96,7 @@ char *serial = NULL;
 
 int my_mbstowcs(wchar_t *dest, const char *src, size_t n) {
     size_t i = 0;
-    int count = 0;
+    size_t count = 0;
     mbstate_t state = {0};
 
     while (i < n) {
