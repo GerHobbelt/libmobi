@@ -92,54 +92,14 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
-void utf8_to_gbk(const char *utf8, char *gbk)
-{
-    size_t i = 0;
-    while (utf8[i]) {
-	int valor = utf8[i];
-	if (valor < 0x80) {
-            // ASCII character, copy directly
-            gbk[i] = utf8[i];
-        } else {
-            // Get UTF-8 sequence length
-            int len = 0;
-            unsigned char ch = utf8[i];
-            while (ch & 0x80) {
-                len++;
-                ch <<= 1;
-            }
 
-            // Determine GBK code according to length
-            unsigned int code;
-            switch(len) {
-            case 2:
-                // 2 bytes, 110XXXXX 10XXXXXX
-                code = ((utf8[i] & 0x1F) << 6) | (utf8[i+1] & 0x3F);
-                break;
-            case 3:
-                // 3 bytes, 1110XXXX 10XXXXXX 10XXXXXX
-                code  = ((utf8[i] & 0x0F) << 12) |
-                        ((utf8[i+1] & 0x3F) << 6) |
-                        (utf8[i+2] & 0x3F);
-                break;
-            case 4:
-                // 4 bytes, 11110www 10xxxxxx 10xxxxxx 10xxxxxx
-                code  = ((utf8[i] & 0x07) << 18) |
-                        ((utf8[i+1] & 0x3F) << 12) |
-                        ((utf8[i+2] & 0x3F) <<  6) |
-                        (utf8[i+3] & 0x3F);
-                break;
-                // ... Convert other lengths
-            }
+void print_utf(char *filename) {
+  
+  // 依次尝试不同的编码输出文件名
+  printf("The filename is: %s\n", filename);   
+  printf("The filename is: %S\n", filename);
+  wprintf(L"The filename is: %s\n", filename);
 
-            // Write converted GBK code to output
-            gbk[i] = code / 256;
-            gbk[i+1] = code % 256;
-            i += len;  // Skip converted UTF-8 chars
-        }
-        i++;
-    }
-    gbk[i] = '\0';  // Null terminator
 }
 
 
@@ -441,14 +401,15 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
         return ERROR;
     }
 
-    // 解决中文文件名乱码  
-    char gbk[255];
-    
-    utf8_to_gbk(cover_path, gbk);
-    
-    // 打印转换后的 GBK 字符串  
-    printf("Saving cover to %s\n", gbk);  
 
+    char filename[] = "你好.txt";
+  
+    // 直接输出 UTF-8 文件名
+    printf("The filename is: %s\n", filename);
+  
+    // 或者使用一个万能的函数来支持不同的编码
+    print_utf(cover_path);
+	
 	
     printf("Saving cover to %s\n", cover_path);
     
@@ -998,14 +959,6 @@ int main(int argc, char *argv[]) {
   
 #ifdef WIN64
     system("chcp 65001>nul");
-#endif
-#ifdef _WIN32  
-    // Windows代码
-    SetConsoleCP(CP_UTF8);
-    SetConsoleOutputCP(CP_UTF8);
-#else
-    // Linux代码
-    setenv("LC_ALL", "zh_CN.UTF8", 1);
 #endif
 
 	
