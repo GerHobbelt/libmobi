@@ -23,7 +23,7 @@
 #include "common.h"
 
 #include <stdio.h>
-
+#include <wchar.h>
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
@@ -391,6 +391,7 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
 	
 	
     printf("Saving cover to %s\n", cover_path);
+    wprintf(L"Saving cover to %ls\n", cover_path);
     
     return write_file(record->data, record->size, cover_path);
 }
