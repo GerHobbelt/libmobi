@@ -22,6 +22,9 @@
 #include <mobi.h>
 #include "common.h"
 
+#include <stdio.h>
+
+
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
 # define MINIZ_HEADER_FILE_ONLY
@@ -936,7 +939,11 @@ int main(int argc, char *argv[]) {
 #ifdef WIN64
     system("chcp 65001>nul"); 
 #endif
-
+#ifdef _WIN32   
+    setenv("LC_ALL", "zh_CN.UTF-8", 1); 
+#else
+    setenv("LC_ALL","zh_CN.UTF-8",1);  
+#endif
 	
     if (argc < 2) {
         exit_with_usage(argv[0]);
