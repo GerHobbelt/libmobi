@@ -119,33 +119,49 @@ int my_mbstowcs(wchar_t *dest, const char *src, size_t n) {
     return i;
 }
 
-void utf16_to_utf8(wchar_t *source, char *dest, int dest_size) {
+void utf16_to_utf8(uint32_t *source, char *dest, int dest_size) {
     int i = 0;
+    int charbytes;
     
-    while (source[i] != '\0' && i < dest_size) {  
-        if (source[i] < 0x80) {  
-            dest[i] = source[i];
-        } else if (source[i] < 0x800) {  
-            dest[i] = 0xC0 | (source[i] >> 6);       
-            dest[i + 1] = 0x80 | (source[i] & 0x3F);
-            i++;
-        } else if (source[i] < 0x10000u) {
-            dest[i] = 0xE0 | (source[i] >> 12);
-            dest[i + 1] = 0x80 | ((source[i] >> 6) & 0x3F);
-            dest[i + 2] = 0x80 | (source[i] & 0x3F);
-            i++;
-            i++;
-        } else {
-            dest[i] = 0xF0 | (source[i] >> 18);
-            dest[i + 1] = 0x80 | ((source[i] >> 12) & 0x3F);
-            dest[i + 2] = 0x80 | ((source[i] >> 6) & 0x3F);
-            dest[i + 3] = 0x80 | (source[i] & 0x3F);
-            i++;
-            i++;
-            i++;
-        }        
-        i++;  
-    } 
+    while (source[i] != '\0' && i < dest_size) {
+        charbytes = 0;  
+                
+        if ((uint8_t)source[i] < 0x80) {   
+            charbytes = 1;   
+        } else if ((uint16_t)source[i] < 0x800){  
+            charbytes = 2;   
+        } else if ((uint32_t)source[i] < 0x10000){ 
+            charbytes = 3;   
+        } else if ((uint32_t)source[i] < 0x110000){  
+            charbytes = 4;    
+        }
+        
+        if (dest_size < charbytes) {
+            break;    
+        }   
+                  
+        switch (charbytes) {
+            case 1:
+                dest[i] = (uint8_t)source[i];
+                break;
+            case 2:
+                dest[i] = 0xC0 | ((source[i] >> 6) & 0x1F);       
+                dest[i + 1] = 0x80 | (source[i] & 0x3F);              
+                break;    
+            case 3:
+                dest[i] = 0xE0 | (source[i] >> 12);
+                dest[i + 1] = 0x80 | ((source[i] >> 6) & 0x3F);
+                dest[i + 2] = 0x80 | (source[i] & 0x3F);
+                break;    
+            case 4:    
+                dest[i] = 0xF0 | (source[i] >> 18);                
+                ...                 
+        }
+        
+        i += charbytes;   
+        dest_size -= charbytes;  
+    }
+    
     dest[i] = '\0';
 }
 
