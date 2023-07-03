@@ -398,8 +398,9 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
 	
     wchar_t* cover_path_wide = NULL;
     // 转换 cover_path 为 UTF-16
-    mbstowcs(cover_path_wide, cover_path, ...);  
+    mbstowcs(cover_path_wide, cover_path, strlen(cover_path) + 1); 
 	
+    char filename[100];
     utf16_to_utf8(cover_path_wide, filename);
   
     // 输出 UTF-8 文件名    
