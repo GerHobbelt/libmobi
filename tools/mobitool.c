@@ -97,7 +97,8 @@ void print_utf(char *filename) {
   
   // 依次尝试不同的编码输出文件名
   printf("The filename is: %s\n", filename);   
-  printf("The filename is: %S\n", filename);
+  // 使用 %ls 格式化串输出宽字符字符串    
+  wprintf(L"The filename is: %ls\n", filename);
   wprintf(L"The filename is: %s\n", filename);
 
 }
