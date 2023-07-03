@@ -92,12 +92,6 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
-#ifdef _WIN32 
-void utf16_to_utf8(wchar_t *source, char *destination) {
-  WideCharToMultiByte(CP_UTF8, 0, source, -1, destination, 0, NULL, NULL);
-}
-#endif
-
 /**
  @brief Print all loaded headers meta information
  @param[in] m MOBIData structure
@@ -395,17 +389,6 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     if (create_path(cover_path, sizeof(cover_path), fullpath, suffix) == ERROR) {
         return ERROR;
     }
-	
-    wchar_t* cover_path_wide = NULL;
-    // 转换 cover_path 为 UTF-16
-    mbstowcs(cover_path_wide, cover_path, strlen(cover_path) + 1); 
-	
-    char filename[100];
-    utf16_to_utf8(cover_path_wide, filename);
-  
-    // 输出 UTF-8 文件名    
-    printf("Saving cover to: %s\n", filename);  
-
 	
 	
     printf("Saving cover to %s\n", cover_path);
@@ -955,9 +938,13 @@ static void exit_with_usage(const char *progname) {
 int main(int argc, char *argv[]) {
   
 #ifdef WIN64
-    system("chcp 65001>nul");
+    system("chcp 65001>nul"); 
 #endif
 
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);  
+#endif
+	
 	
     if (argc < 2) {
         exit_with_usage(argv[0]);
