@@ -92,17 +92,11 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
-
-void print_utf(char *filename) {
-  
-  // 依次尝试不同的编码输出文件名
-  printf("The filename is: %s\n", filename);   
-  // 使用 %ls 格式化串输出宽字符字符串    
-  wprintf(L"The filename is: %ls\n", filename);
-  wprintf(L"The filename is: %s\n", filename);
-
+#ifdef _WIN32 
+void utf16_to_utf8(wchar_t *source, char *destination) {
+  WideCharToMultiByte(CP_UTF8, 0, source, -1, destination, 0, NULL, NULL);
 }
-
+#endif
 
 /**
  @brief Print all loaded headers meta information
@@ -402,14 +396,13 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
         return ERROR;
     }
 
+    char filename[100];  
+	// 将 UTF-16 文件名转换为 UTF-8
+  	utf16_to_utf8(cover_path, filename);
+  
+  	// 输出 UTF-8 文件名    
+ 	 printf("Saving cover to: %s\n", filename);  
 
-    char filename[] = "你好.txt";
-  
-    // 直接输出 UTF-8 文件名
-    printf("The filename is: %s\n", filename);
-  
-    // 或者使用一个万能的函数来支持不同的编码
-    print_utf(cover_path);
 	
 	
     printf("Saving cover to %s\n", cover_path);
