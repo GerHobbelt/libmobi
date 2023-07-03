@@ -24,7 +24,8 @@
 
 #include <stdio.h>
 #include <windows.h> 
-#include <cwchar>
+#include <wchar.h>
+
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
@@ -91,6 +92,33 @@ bool setserial_opt = false;
 char *pid = NULL;
 char *serial = NULL;
 #endif
+
+
+int my_mbstowcs(wchar_t *dest, const char *src, size_t n) {
+    size_t i = 0;
+    int count = 0;
+    mbstate_t state = {0};
+
+    while (i < n) {
+        size_t result = mbrtowc(&dest[i], &src[count], MB_CUR_MAX, &state);
+
+        if (result == (size_t)-1 || result == (size_t)-2) {
+            // Invalid or incomplete multibyte character
+            return -1;
+        }
+
+        count += result;
+        i++;
+
+        if (count >= strlen(src)) {
+            // End of string reached
+            break;
+        }
+    }
+
+    return i;
+}
+
 
 void utf16_to_utf8(wchar_t *source, char *dest, int dest_size) {
     int i = 0;
@@ -417,7 +445,7 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     char filename8[100]; 
     wchar_t* cover_path_wide = NULL;
     // 转换 cover_path 为 UTF-16
-    mbstowcs(cover_path_wide, cover_path, strlen(cover_path) + 1); 
+    my_mbstowcs(cover_path_wide, cover_path, strlen(cover_path) + 1); 
 
     utf16_to_utf8(cover_path_wide, filename8, 100);
  
