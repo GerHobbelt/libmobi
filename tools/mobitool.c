@@ -119,7 +119,6 @@ int my_mbstowcs(wchar_t *dest, const char *src, size_t n) {
     return i;
 }
 
-
 void utf16_to_utf8(wchar_t *source, char *dest, int dest_size) {
     int i = 0;
     
