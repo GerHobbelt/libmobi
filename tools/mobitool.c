@@ -23,7 +23,7 @@
 #include "common.h"
 
 #include <stdio.h>
-#include <wchar.h>
+#include <windows.h> 
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
@@ -90,6 +90,27 @@ bool setserial_opt = false;
 char *pid = NULL;
 char *serial = NULL;
 #endif
+
+void utf16_to_utf8(wchar_t *source, char *dest, int dest_size) {
+    int i = 0;
+    
+    while (source[i] != '\0' && i < dest_size) {  
+        if (source[i] < 0x80) {  
+            dest[i] = source[i];
+        } else if (source[i] < 0x800) {  
+            dest[i] = 0xC0 | (source[i] >> 6);       
+            dest[i + 1] = 0x80 | (source[i++] & 0x3F); 
+            i++;
+        } else {
+            // ..  处理3/4字节UTF-8编码 
+        }        
+        i++;  
+    } 
+    dest[i] = '\0';
+}
+
+
+
 
 /**
  @brief Print all loaded headers meta information
@@ -391,7 +412,11 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
 	
 	
     printf("Saving cover to %s\n", cover_path);
-    wprintf(L"Saving cover to %ls\n", cover_path);
+	
+    char filename8[100]; 
+    utf16_to_utf8(cover_path, filename8, 100);   
+    printf("Saving cover to 保存至: %s\n", filename8); 
+
     
     return write_file(record->data, record->size, cover_path);
 }
