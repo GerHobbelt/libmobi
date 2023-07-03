@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <windows.h> 
+#include <cwchar>
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
@@ -414,7 +415,12 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     printf("Saving cover to %s\n", cover_path);
 	
     char filename8[100]; 
-    utf16_to_utf8(cover_path, filename8, 100);   
+    wchar_t* cover_path_wide = NULL;
+    // 转换 cover_path 为 UTF-16
+    mbstowcs(cover_path_wide, cover_path, strlen(cover_path) + 1); 
+
+    utf16_to_utf8(cover_path_wide, filename8, 100);
+ 
     printf("Saving cover to 保存至: %s\n", filename8); 
 
     
