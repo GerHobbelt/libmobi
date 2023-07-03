@@ -940,7 +940,8 @@ int main(int argc, char *argv[]) {
     system("chcp 65001>nul"); 
 #endif
 #ifdef _WIN32     
-   setenv("LC_ALL", "zh_CN.UTF-8", 1);
+   //setenv("LC_ALL", "zh_CN.UTF-8", 1);
+   putenv("LC_ALL=zh_CN.UTF-8")
 #else
    setenv("LC_ALL", "zh_CN.UTF-8", 1);
 #endif
