@@ -128,17 +128,27 @@ void utf16_to_utf8(wchar_t *source, char *dest, int dest_size) {
             dest[i] = source[i];
         } else if (source[i] < 0x800) {  
             dest[i] = 0xC0 | (source[i] >> 6);       
-            dest[i + 1] = 0x80 | (source[i++] & 0x3F); 
+            dest[i + 1] = 0x80 | (source[i] & 0x3F);
+            i++;
+        } else if (source[i] < 0x10000) {
+            dest[i] = 0xE0 | (source[i] >> 12);
+            dest[i + 1] = 0x80 | ((source[i] >> 6) & 0x3F);
+            dest[i + 2] = 0x80 | (source[i] & 0x3F);
+            i++;
             i++;
         } else {
-            // ..  处理3/4字节UTF-8编码 
+            dest[i] = 0xF0 | (source[i] >> 18);
+            dest[i + 1] = 0x80 | ((source[i] >> 12) & 0x3F);
+            dest[i + 2] = 0x80 | ((source[i] >> 6) & 0x3F);
+            dest[i + 3] = 0x80 | (source[i] & 0x3F);
+            i++;
+            i++;
+            i++;
         }        
         i++;  
     } 
     dest[i] = '\0';
 }
-
-
 
 
 /**
