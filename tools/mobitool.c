@@ -130,7 +130,7 @@ void utf16_to_utf8(wchar_t *source, char *dest, int dest_size) {
             dest[i] = 0xC0 | (source[i] >> 6);       
             dest[i + 1] = 0x80 | (source[i] & 0x3F);
             i++;
-        } else if (source[i] < 0x10000) {
+        } else if (source[i] < 0x10000u) {
             dest[i] = 0xE0 | (source[i] >> 12);
             dest[i + 1] = 0x80 | ((source[i] >> 6) & 0x3F);
             dest[i + 2] = 0x80 | (source[i] & 0x3F);
