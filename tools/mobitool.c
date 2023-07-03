@@ -22,10 +22,6 @@
 #include <mobi.h>
 #include "common.h"
 
-#include <windows.h>
-#include <stdio.h>
-
-
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
 # define MINIZ_HEADER_FILE_ONLY
@@ -941,10 +937,6 @@ int main(int argc, char *argv[]) {
     system("chcp 65001>nul"); 
 #endif
 
-#ifdef _WIN32
-    SetConsoleOutputCP(CP_UTF8);  
-#endif
-	
 	
     if (argc < 2) {
         exit_with_usage(argv[0]);
