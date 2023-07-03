@@ -395,13 +395,15 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     if (create_path(cover_path, sizeof(cover_path), fullpath, suffix) == ERROR) {
         return ERROR;
     }
-
-    char filename[100];  
-	// 将 UTF-16 文件名转换为 UTF-8
-  	utf16_to_utf8(cover_path, filename);
+	
+    wchar_t* cover_path_wide = NULL;
+    // 转换 cover_path 为 UTF-16
+    mbstowcs(cover_path_wide, cover_path, ...);  
+	
+    utf16_to_utf8(cover_path_wide, filename);
   
-  	// 输出 UTF-8 文件名    
- 	 printf("Saving cover to: %s\n", filename);  
+    // 输出 UTF-8 文件名    
+    printf("Saving cover to: %s\n", filename);  
 
 	
 	
