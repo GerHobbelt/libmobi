@@ -22,10 +22,6 @@
 #include <mobi.h>
 #include "common.h"
 
-#ifdef _WIN32
-# include <windows.h>
-#endif
-
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
 # define MINIZ_HEADER_FILE_ONLY
@@ -389,8 +385,7 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     if (create_path(cover_path, sizeof(cover_path), fullpath, suffix) == ERROR) {
         return ERROR;
     }
-	
-	
+    
     printf("Saving cover to %s\n", cover_path);
     
     return write_file(record->data, record->size, cover_path);
@@ -936,11 +931,8 @@ static void exit_with_usage(const char *progname) {
  @return SUCCESS (0) or ERROR (1)
  */
 int main(int argc, char *argv[]) {
-  
-
-#ifdef _WIN32     
-    system("chcp 65001>nul"); 
-    putenv("LC_ALL=zh_CN.UTF-8");
+#ifdef _WIN32
+    system("chcp 65001>nul");
 #endif
 	
     if (argc < 2) {
