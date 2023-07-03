@@ -22,10 +22,9 @@
 #include <mobi.h>
 #include "common.h"
 
-#include <stdio.h>
-#include <windows.h> 
-#include <wchar.h>
-
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
@@ -92,71 +91,6 @@ bool setserial_opt = false;
 char *pid = NULL;
 char *serial = NULL;
 #endif
-
-
-int my_mbstowcs(wchar_t *dest, const char *src, size_t n) {
-    size_t i = 0;
-    size_t count = 0;
-    mbstate_t state = {0};
-
-    while (i < n) {
-        size_t result = mbrtowc(&dest[i], &src[count], MB_CUR_MAX, &state);
-
-        if (result == (size_t)-1 || result == (size_t)-2) {
-            // Invalid or incomplete multibyte character
-            return -1;
-        }
-
-        count += result;
-        i++;
-
-        if (count >= strlen(src)) {
-            // End of string reached
-            break;
-        }
-    }
-
-    return i;
-}
-
-void utf16_to_utf8(wchar_t *source, char *dest, int dest_size) {
-    int i = 0;
-    
-    while (source[i] != '\0' && i < dest_size) {
-        if (source[i] < 0x80) {
-            dest[i] = source[i];
-        } else if (source[i] < 0x800) {
-            dest[i] = 0xC0 | (source[i] >> 6);
-            dest[i + 1] = 0x80 | (source[i] & 0x3F);
-            i++;
-        } else if (source[i] >= 0xD800 && source[i] < 0xDC00) {
-            // high surrogate, combine with next character to form 32-bit code point
-            if (source[i + 1] >= 0xDC00 && source[i + 1] < 0xE000) {
-                uint32_t code_point = ((source[i] - 0xD800) << 10) + (source[i + 1] - 0xDC00) + 0x10000;
-                dest[i] = 0xF0 | (code_point >> 18);
-                dest[i + 1] = 0x80 | ((code_point >> 12) & 0x3F);
-                dest[i + 2] = 0x80 | ((code_point >> 6) & 0x3F);
-                dest[i + 3] = 0x80 | (code_point & 0x3F);
-                i++;
-                i++;
-                i++;
-            } else {
-                // error: invalid surrogate pair
-            }
-        } else if (source[i] >= 0xDC00 && source[i] < 0xE000) {
-            // low surrogate, should be combined with previous character
-            // error: invalid surrogate pair
-        } else {
-            dest[i] = 0xE0 | (source[i] >> 12);
-            dest[i + 1] = 0x80 | ((source[i] >> 6) & 0x3F);
-            dest[i + 2] = 0x80 | (source[i] & 0x3F);
-            i++;
-            i++;
-        }
-        i++;
-    }
-    dest[i] = '\0';
-}
 
 /**
  @brief Print all loaded headers meta information
@@ -458,16 +392,6 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
 	
 	
     printf("Saving cover to %s\n", cover_path);
-	
-    char filename8[100]; 
-    wchar_t* cover_path_wide = NULL;
-    // 转换 cover_path 为 UTF-16
-    my_mbstowcs(cover_path_wide, cover_path, strlen(cover_path) + 1); 
-
-    utf16_to_utf8(cover_path_wide, filename8, 100);
- 
-    printf("Saving cover to 保存至: %s\n", filename8); 
-
     
     return write_file(record->data, record->size, cover_path);
 }
@@ -1019,8 +943,6 @@ int main(int argc, char *argv[]) {
 #ifdef _WIN32     
    //setenv("LC_ALL", "zh_CN.UTF-8", 1);
    putenv("LC_ALL=zh_CN.UTF-8");
-#else
-   setenv("LC_ALL", "zh_CN.UTF-8", 1);
 #endif
 	
     if (argc < 2) {
