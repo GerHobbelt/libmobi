@@ -23,7 +23,7 @@
 #include "common.h"
 
 #ifdef _WIN32
-#include <windows.h>
+# include <windows.h>
 #endif
 
 /* miniz file is needed for EPUB creation */
@@ -937,12 +937,10 @@ static void exit_with_usage(const char *progname) {
  */
 int main(int argc, char *argv[]) {
   
-#ifdef WIN64
-    system("chcp 65001>nul"); 
-#endif
+
 #ifdef _WIN32     
-   //setenv("LC_ALL", "zh_CN.UTF-8", 1);
-   putenv("LC_ALL=zh_CN.UTF-8");
+    system("chcp 65001>nul"); 
+    putenv("LC_ALL=zh_CN.UTF-8");
 #endif
 	
     if (argc < 2) {
