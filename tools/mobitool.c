@@ -26,7 +26,8 @@
 #include <stdio.h>
 #include <io.h>
 #include <fcntl.h>
-
+#include <iostream>
+#include <ios>
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
