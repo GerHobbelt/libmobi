@@ -393,9 +393,12 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     }
     
     printf("Saving cover to %s\n", cover_path);
+
+    setmode(_fileno(stdout), _O_U16TEXT);
+    printf("Saving cover to %s\n", cover_path);
 	
 #ifdef _WIN32
-    _setmode(_fileno(stdout), _O_U8TEXT);
+    _setmode(_fileno(stdout), _O_U16TEXT);
 #endif
     printf("Saving cover to %s\n", cover_path);
 	
