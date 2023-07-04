@@ -22,6 +22,12 @@
 #include <mobi.h>
 #include "common.h"
 
+
+#include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
+
+
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
 # define MINIZ_HEADER_FILE_ONLY
@@ -931,8 +937,16 @@ static void exit_with_usage(const char *progname) {
  @return SUCCESS (0) or ERROR (1)
  */
 int main(int argc, char *argv[]) {
+
+    fflush(stdout);
 #ifdef _WIN32
     system("chcp 65001>nul");
+    // change file stream translation mode
+    _setmode(_fileno(stdout), _O_U16TEXT);
+    _setmode(_fileno(stderr), _O_U16TEXT);
+    _setmode(_fileno(stdin), _O_U16TEXT);  
+
+    std::ios_base::sync_with_stdio(false);
 #endif
 	
     if (argc < 2) {
