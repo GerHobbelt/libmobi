@@ -938,7 +938,6 @@ static void exit_with_usage(const char *progname) {
  */
 int main(int argc, char *argv[]) {
 
-    fflush(stdout);
 #ifdef _WIN32
     system("chcp 65001>nul");
     // change file stream translation mode
@@ -946,7 +945,6 @@ int main(int argc, char *argv[]) {
     _setmode(_fileno(stderr), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);  
 
-    setvbuf(stdout, NULL, _IONBF, 0);
 #endif
 	
     if (argc < 2) {
