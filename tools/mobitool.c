@@ -26,8 +26,7 @@
 #include <stdio.h>
 #include <io.h>
 #include <fcntl.h>
-#include <iostream>
-#include <ios>
+
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
@@ -947,7 +946,7 @@ int main(int argc, char *argv[]) {
     _setmode(_fileno(stderr), _O_U16TEXT);
     _setmode(_fileno(stdin), _O_U16TEXT);  
 
-    std::ios_base::sync_with_stdio(false);
+    setvbuf(stdout, NULL, _IONBF, 0);
 #endif
 	
     if (argc < 2) {
