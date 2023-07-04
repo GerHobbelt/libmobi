@@ -939,11 +939,11 @@ static void exit_with_usage(const char *progname) {
 int main(int argc, char *argv[]) {
 
 #ifdef _WIN32
-    system("chcp 65001>nul");
+    //system("chcp 65001>nul");
     // change file stream translation mode
-    _setmode(_fileno(stdout), _O_U16TEXT);
-    _setmode(_fileno(stderr), _O_U16TEXT);
-    _setmode(_fileno(stdin), _O_U16TEXT);  
+    _setmode(_fileno(stdout), _O_U8TEXT);
+    _setmode(_fileno(stderr), _O_U8TEXT);
+    _setmode(_fileno(stdin), _O_U8TEXT);  
 
 #endif
 	
