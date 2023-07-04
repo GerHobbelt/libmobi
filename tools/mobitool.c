@@ -94,6 +94,21 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
+
+void print_hex(const unsigned char* data, int len)
+{
+    for (int i = 0; i < len; i++) {
+        printf("%02X ", data[i]);
+    }
+    printf("\n");
+}
+
+
+
+
+
+
+
 /**
  @brief Print all loaded headers meta information
  @param[in] m MOBIData structure
@@ -393,6 +408,8 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     }
     
     printf("Saving cover to %s\n", cover_path);
+
+    print_hex((unsigned char*)cover_path, sizeof(cover_path) - 1);
 
     wprintf(L"%s\n", cover_path);
     wchar_t wcover_path[100];
