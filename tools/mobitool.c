@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 #ifdef _WIN32  // 判断是否是 Windows 平台
-# include <Windows.h>
+# include <windows.h>
 #endif
 
 
