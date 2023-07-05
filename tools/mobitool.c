@@ -461,7 +461,16 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     mbstowcs(wcover_path, cover_path, 100);
     wprintf(L"xxxx%ls\n", wcover_path);
     printf("xxxxx%ls\n", wcover_path);
-
+	
+    char utf8_str2[1024];
+    int utf8_len2 = sizeof(utf8_str2);
+    int ret = gb2312_to_utf8(cover_path, sizeof(cover_path) - 1, utf8_str2, utf8_len2);
+    if (ret == -1) {
+        printf("Error: the buffer for UTF-8 string is too small!\n");
+        return -1;
+    }
+    utf8_str[ret] = '\0';
+    printf("UTF-8 string: %s\n", utf8_str2);
 	
 #ifdef _WIN32
     _setmode(_fileno(stdout), _O_U16TEXT);
