@@ -453,7 +453,7 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     printf("xxxxx%ls\n", wcover_path);
 	
     char utf8_str[1024];
-    int utf8_len = sizeof(utf8_str2);
+    int utf8_len = sizeof(utf8_str);
     int ret = gb2312_to_utf8(cover_path, sizeof(cover_path) - 1, utf8_str, utf8_len);
     if (ret == -1) {
         printf("Error: the buffer for UTF-8 string is too small!\n");
