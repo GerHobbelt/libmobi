@@ -442,11 +442,7 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     
     printf("Saving cover to %s\n", cover_path);
 
-    print_hex((unsigned char*)cover_path, sizeof(cover_path) - 1);
-
-	
-    wprintf(L"%s\n", cover_path);
-    wchar_t wcover_path[100];
+    //print_hex((unsigned char*)cover_path, sizeof(cover_path) - 1);
 
     mbstowcs(wcover_path, cover_path, 100);
     wprintf(L"xxxx%ls\n", wcover_path);
