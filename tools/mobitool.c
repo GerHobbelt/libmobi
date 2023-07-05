@@ -97,9 +97,9 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
-#ifdef _WIN32
 int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int utf8_len)
 {
+#ifdef _WIN32
     int len = MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, NULL, 0);
     if (len == 0) {
         return -1;
@@ -125,9 +125,11 @@ int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int u
     }
     free(wstr);
     return len;
-}
+#else
+    // 在其他平台上使用其他的编码转换方法
+    return -1;
 #endif
-
+}
 
 
 /**
