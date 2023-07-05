@@ -443,10 +443,6 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     printf("Saving cover to %s\n", cover_path);
 
     //print_hex((unsigned char*)cover_path, sizeof(cover_path) - 1);
-
-    mbstowcs(wcover_path, cover_path, 100);
-    wprintf(L"xxxx%ls\n", wcover_path);
-    printf("xxxxx%ls\n", wcover_path);
 	
     char utf8_str[1024];
     int utf8_len = sizeof(utf8_str);
