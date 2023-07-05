@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <iconv.h>
+
 
 
 
@@ -95,30 +95,41 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
+#define GB2312_START   0xA1
+#define GB2312_END     0xFE
+#define GB2312_CHARLEN 2
+#define UTF8_CHARLEN   3
+
 int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int utf8_len)
 {
-    iconv_t cd;
-    const char* inbuf = gb2312_str;
-    char* outbuf = utf8_str;
-    size_t inbytesleft = gb2312_len;
-    size_t outbytesleft = utf8_len;
-    size_t res = 0;
+    int i, j, k;
+    unsigned char gb_char[GB2312_CHARLEN];
+    unsigned char utf_char[UTF8_CHARLEN];
+    int utf_len = 0;
 
-    cd = iconv_open("UTF-8", "GB2312");
-    if (cd == (iconv_t)(-1)) {
-        return -1;
+    for (i = 0, j = 0; i < gb2312_len && j < utf8_len; i += GB2312_CHARLEN, j += UTF8_CHARLEN) {
+        gb_char[0] = gb2312_str[i];
+        gb_char[1] = gb2312_str[i + 1];
+
+        if (gb_char[0] >= GB2312_START && gb_char[0] <= GB2312_END && gb_char[1] >= GB2312_START && gb_char[1] <= GB2312_END) {
+            utf_char[0] = 0xE0 | (gb_char[0] >> 4);
+            utf_char[1] = 0x80 | ((gb_char[0] & 0x0F) << 2) | ((gb_char[1] & 0xC0) >> 6);
+            utf_char[2] = 0x80 | (gb_char[1] & 0x3F);
+            for (k = 0; k < UTF8_CHARLEN; k++) {
+                utf8_str[j + k] = utf_char[k];
+            }
+            utf_len += UTF8_CHARLEN;
+        } else {
+            for (k = 0; k < GB2312_CHARLEN; k++) {
+                utf8_str[j + k] = gb_char[k];
+            }
+            utf_len += GB2312_CHARLEN;
+        }
     }
 
-    res = iconv(cd, (char**)&inbuf, &inbytesleft, &outbuf, &outbytesleft);
-    if (res == (size_t)(-1)) {
-        iconv_close(cd);
-        return -1;
-    }
-
-    iconv_close(cd);
-
-    return utf8_len - outbytesleft;
+    return utf_len;
 }
+
 
 
 /**
