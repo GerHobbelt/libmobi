@@ -24,11 +24,10 @@
 
 
 #include <stdio.h>
-#include <io.h>
-#include <fcntl.h>
-#include <wchar.h>
 #include <string.h>
-#include <windows.h>
+#ifdef _WIN32  // 判断是否是 Windows 平台
+# include <Windows.h>
+#endif
 
 
 
@@ -98,16 +97,7 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
-
-void print_hex(const unsigned char* data, int len)
-{
-    for (int i = 0; i < len; i++) {
-        printf("%02X ", data[i]);
-    }
-    printf("\n");
-}
-
-
+#ifdef _WIN32
 int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int utf8_len)
 {
     int len = MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, NULL, 0);
@@ -136,9 +126,7 @@ int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int u
     free(wstr);
     return len;
 }
-
-
-
+#endif
 
 
 
@@ -442,7 +430,19 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     
     printf("Saving cover to %s\n", cover_path);
 
-    //print_hex((unsigned char*)cover_path, sizeof(cover_path) - 1);
+#ifdef _WIN32
+    char gb2312_str[] = "\xD5\xF5\xD6\xB5\xB9\xDC\xC0\xED\xB1\xEA\xD7\xBC\x5F\x63\x6F\x76\x65\x72\x2E\x6A\x70\x67";
+
+    // 将 GB2312 编码的字符串转换成 UTF-8 编码的字符串
+    char utf8_str2[1024];
+    int utf8_len2 = sizeof(utf8_str2);
+    int ret = gb2312_to_utf8(gb2312_str, sizeof(gb2312_str) - 1, utf8_str2, utf8_len2);
+    if (ret == -1) {
+        printf("Error: the buffer for UTF-8 string is too small!\n");
+        return -1;
+    }
+    utf8_str2[ret] = '\0';
+    printf("UTF-8 string: %s\n", utf8_str2);
 	
     char utf8_str[1024];
     int utf8_len = sizeof(utf8_str);
@@ -453,7 +453,8 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     }
     utf8_str[ret] = '\0';
     printf("UTF-8 string: %s\n", utf8_str);	
-
+#endif
+	
     return write_file(record->data, record->size, cover_path);
 }
 
