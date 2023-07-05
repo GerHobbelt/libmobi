@@ -436,8 +436,8 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     // 将 GB2312 编码的字符串转换成 UTF-8 编码的字符串
     char utf8_str2[1024];
     int utf8_len2 = sizeof(utf8_str2);
-    int ret = gb2312_to_utf8(gb2312_str, sizeof(gb2312_str) - 1, utf8_str2, utf8_len2);
-    if (ret == -1) {
+    int ret2 = gb2312_to_utf8(gb2312_str, sizeof(gb2312_str) - 1, utf8_str2, utf8_len2);
+    if (ret2 == -1) {
         printf("Error: the buffer for UTF-8 string is too small!\n");
         return -1;
     }
