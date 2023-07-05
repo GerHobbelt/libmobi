@@ -25,9 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#ifdef _WIN32  // 判断是否是 Windows 平台
-# include <windows.h>
-#endif
+#include <iconv.h>
 
 
 
@@ -99,36 +97,27 @@ char *serial = NULL;
 
 int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int utf8_len)
 {
-#ifdef _WIN32
-    int len = MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, NULL, 0);
-    if (len == 0) {
+    iconv_t cd;
+    const char* inbuf = gb2312_str;
+    char* outbuf = utf8_str;
+    size_t inbytesleft = gb2312_len;
+    size_t outbytesleft = utf8_len;
+    size_t res = 0;
+
+    cd = iconv_open("UTF-8", "GB2312");
+    if (cd == (iconv_t)(-1)) {
         return -1;
     }
-    wchar_t* wstr = (wchar_t*)malloc(len * sizeof(wchar_t));
-    if (MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, wstr, len) == 0) {
-        free(wstr);
+
+    res = iconv(cd, (char**)&inbuf, &inbytesleft, &outbuf, &outbytesleft);
+    if (res == (size_t)(-1)) {
+        iconv_close(cd);
         return -1;
     }
-    len = WideCharToMultiByte(CP_UTF8, 0, wstr, len, NULL, 0, NULL, NULL);
-    if (len == 0) {
-        free(wstr);
-        return -1;
-    }
-    if (len + 1 > utf8_len) {
-        free(wstr);
-        return -1;
-    }
-    if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, utf8_str, len + 1, NULL, NULL) == 0)
-    {
-        free(wstr);
-        return -1;
-    }
-    free(wstr);
-    return len;
-#else
-    // 在其他平台上使用其他的编码转换方法
-    return -1;
-#endif
+
+    iconv_close(cd);
+
+    return utf8_len - outbytesleft;
 }
 
 
