@@ -27,6 +27,10 @@
 #include <io.h>
 #include <fcntl.h>
 #include <wchar.h>
+#include <string.h>
+#include <windows.h>
+
+
 
 /* miniz file is needed for EPUB creation */
 #ifdef USE_XMLWRITER
@@ -103,6 +107,35 @@ void print_hex(const unsigned char* data, int len)
     printf("\n");
 }
 
+
+int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int utf8_len)
+{
+    int len = MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, NULL, 0);
+    if (len == 0) {
+        return -1;
+    }
+    wchar_t* wstr = (wchar_t*)malloc(len * sizeof(wchar_t));
+    if (MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, wstr, len) == 0) {
+        free(wstr);
+        return -1;
+    }
+    len = WideCharToMultiByte(CP_UTF8, 0, wstr, len, NULL, 0, NULL, NULL);
+    if (len == 0) {
+        free(wstr);
+        return -1;
+    }
+    if (len + 1 > utf8_len) {
+        free(wstr);
+        return -1;
+    }
+    if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, utf8_str, len + 1, NULL, NULL) == 0)
+    {
+        free(wstr);
+        return -1;
+    }
+    free(wstr);
+    return len;
+}
 
 
 
@@ -411,6 +444,17 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
 
     print_hex((unsigned char*)cover_path, sizeof(cover_path) - 1);
 
+    char utf8_str[1024];
+    int utf8_len = sizeof(utf8_str);
+    int ret = gb2312_to_utf8(cover_path, sizeof(cover_path) - 1, utf8_str, utf8_len);
+    if (ret == -1) {
+        printf("Error: the buffer for UTF-8 string is too small!\n");
+        return -1;
+    }
+    utf8_str[ret] = '\0';
+    printf("UTF-8 string: %s\n", utf8_str);
+
+	
     wprintf(L"%s\n", cover_path);
     wchar_t wcover_path[100];
 
