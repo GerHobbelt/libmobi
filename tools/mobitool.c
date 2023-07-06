@@ -23,10 +23,8 @@
 #include "common.h"
 
 
-#include <stdio.h>
-#include <string.h>
-
 #ifdef _WIN32
+# include <stdint.h>
 # include <windows.h>
 #endif
 
@@ -398,31 +396,13 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     printf("Saving cover to %s\n", cover_path);
 
 #ifdef _WIN32
-    HANDLE hFile;
-    DWORD dwBytesWritten;
-    const char* str = "Hello, world!";
-    BOOL success;
+    // 获取当前进程 ID
+    uint32_t pid = GetCurrentProcessId();
+    printf("Process ID: %u\n", pid);
 
-    // 打开或创建文件
-    hFile = CreateFile("test.txt", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hFile == INVALID_HANDLE_VALUE) {
-        printf("Create file error!\n");
-        return -1;
-    }
-
-    // 写入文件
-    success = WriteFile(hFile, str, strlen(str), &dwBytesWritten, NULL);
-    if (!success) {
-        printf("Write file error!\n");
-        CloseHandle(hFile);
-        return -1;
-    }
-
-    // 关闭文件
-    CloseHandle(hFile);
-
-    printf("File written successfully!\n");
-
+    // 获取当前进程句柄
+    HANDLE handle = GetCurrentProcess();
+    printf("Process handle: %p\n", handle);
 #endif
 	
     return write_file(record->data, record->size, cover_path);
