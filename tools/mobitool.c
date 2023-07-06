@@ -25,9 +25,10 @@
 
 #include <stdio.h>
 #include <string.h>
-#define NOMINMAX
-#include <Windows.h>
 
+#ifdef _WIN32
+# include <windows.h>
+#endif
 
 
 /* miniz file is needed for EPUB creation */
@@ -95,72 +96,6 @@ bool setserial_opt = false;
 char *pid = NULL;
 char *serial = NULL;
 #endif
-
-#define GB2312_START   0xA1
-#define GB2312_END     0xFE
-#define GB2312_CHARLEN 2
-#define UTF8_CHARLEN   3
-
-int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int utf8_len)
-{
-    int i, j, k;
-    unsigned char gb_char[GB2312_CHARLEN];
-    unsigned char utf_char[UTF8_CHARLEN];
-    int utf_len = 0;
-
-    for (i = 0, j = 0; i < gb2312_len && j < utf8_len; i += GB2312_CHARLEN, j += UTF8_CHARLEN) {
-        gb_char[0] = gb2312_str[i];
-        gb_char[1] = gb2312_str[i + 1];
-
-        if (gb_char[0] >= GB2312_START && gb_char[0] <= GB2312_END && gb_char[1] >= GB2312_START && gb_char[1] <= GB2312_END) {
-            utf_char[0] = 0xE0 | (gb_char[0] >> 4);
-            utf_char[1] = 0x80 | ((gb_char[0] & 0x0F) << 2) | ((gb_char[1] & 0xC0) >> 6);
-            utf_char[2] = 0x80 | (gb_char[1] & 0x3F);
-            for (k = 0; k < UTF8_CHARLEN; k++) {
-                utf8_str[j + k] = utf_char[k];
-            }
-            utf_len += UTF8_CHARLEN;
-        } else {
-            for (k = 0; k < GB2312_CHARLEN; k++) {
-                utf8_str[j + k] = gb_char[k];
-            }
-            utf_len += GB2312_CHARLEN;
-        }
-    }
-
-    return utf_len;
-}
-
-
-int gbk_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int utf8_len)
-{
-    int len = MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, NULL, 0);
-    if (len == 0) {
-        return -1;
-    }
-    wchar_t* wstr = (wchar_t*)malloc(len * sizeof(wchar_t));
-    if (MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, wstr, len) == 0) {
-        free(wstr);
-        return -1;
-    }
-    len = WideCharToMultiByte(CP_UTF8, 0, wstr, len, NULL, 0, NULL, NULL);
-    if (len == 0) {
-        free(wstr);
-        return -1;
-    }
-    if (len + 1 > utf8_len) {
-        free(wstr);
-        return -1;
-    }
-    if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, utf8_str, len + 1, NULL, NULL) == 0) {
-        free(wstr);
-        return -1;
-    }
-    free(wstr);
-    return len;
-}
-
-
 
 /**
  @brief Print all loaded headers meta information
@@ -463,19 +398,30 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     printf("Saving cover to %s\n", cover_path);
 
 #ifdef _WIN32
-    char gb2312_str[] = "\xD5\xF5\xD6\xB5\xB9\xDC\xC0\xED\xB1\xEA\xD7\xBC\x5F\x63\x6F\x76\x65\x72\x2E\x6A\x70\x67";
+    HANDLE hFile;
+    DWORD dwBytesWritten;
+    const char* str = "Hello, world!";
+    BOOL success;
 
-    // 将 GB2312 编码的字符串转换成 UTF-8 编码的字符串
-    char utf8_str2[1024];
-    int utf8_len2 = sizeof(utf8_str2);
-    int ret2 = gb2312_to_utf8(gb2312_str, sizeof(gb2312_str) - 1, utf8_str2, utf8_len2);
-    if (ret2 == -1) {
-        printf("Error: the buffer for UTF-8 string is too small!\n");
+    // 打开或创建文件
+    hFile = CreateFile("test.txt", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hFile == INVALID_HANDLE_VALUE) {
+        printf("Create file error!\n");
         return -1;
     }
-    utf8_str2[ret2] = '\0';
-    printf("UTF-8 string: %s\n", utf8_str2);
-	
+
+    // 写入文件
+    success = WriteFile(hFile, str, strlen(str), &dwBytesWritten, NULL);
+    if (!success) {
+        printf("Write file error!\n");
+        CloseHandle(hFile);
+        return -1;
+    }
+
+    // 关闭文件
+    CloseHandle(hFile);
+
+    printf("File written successfully!\n");
 
 #endif
 	
