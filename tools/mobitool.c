@@ -25,7 +25,8 @@
 
 #include <stdio.h>
 #include <string.h>
-
+#define NOMINMAX
+#include <Windows.h>
 
 
 
@@ -128,6 +129,35 @@ int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int u
     }
 
     return utf_len;
+}
+
+
+int gbk_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int utf8_len)
+{
+    int len = MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, NULL, 0);
+    if (len == 0) {
+        return -1;
+    }
+    wchar_t* wstr = (wchar_t*)malloc(len * sizeof(wchar_t));
+    if (MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, wstr, len) == 0) {
+        free(wstr);
+        return -1;
+    }
+    len = WideCharToMultiByte(CP_UTF8, 0, wstr, len, NULL, 0, NULL, NULL);
+    if (len == 0) {
+        free(wstr);
+        return -1;
+    }
+    if (len + 1 > utf8_len) {
+        free(wstr);
+        return -1;
+    }
+    if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, utf8_str, len + 1, NULL, NULL) == 0) {
+        free(wstr);
+        return -1;
+    }
+    free(wstr);
+    return len;
 }
 
 
