@@ -13,9 +13,11 @@
  */
 
 #ifdef _WIN32
+// 取代 windows.h 中的宏定义 
+# define ERROR my_ERROR
+# define ARRAYSIZE my_ARRAYSIZE
 # include <stdint.h>
 # include <windows.h>
-# define printf(fmt, ...) fprintf(stdout, fmt, ##__VA_ARGS__)
 #endif
 
 #include <string.h>
