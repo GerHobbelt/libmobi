@@ -12,13 +12,39 @@
  * See <http://www.gnu.org/licenses/>
  */
 
-#ifdef _WIN32
-// 取代 windows.h 中的宏定义 
-# define ERROR my_ERROR
-# define ARRAYSIZE my_ARRAYSIZE
-# include <stdint.h>
-# include <windows.h>
+#ifdef _MSC_VER
+/* Disable warnings for redefining macros in Windows headers */
+#pragma warning(push)
+#pragma warning(disable:4005)
 #endif
+
+/* Define my_ERROR and my_ARRAYSIZE to replace ERROR and ARRAYSIZE */
+#define my_ERROR 1
+#define my_ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+
+/* Replace ERROR and ARRAYSIZE in common.h */
+#ifdef ERROR
+#undef ERROR
+#endif
+#define ERROR my_ERROR
+
+#ifdef ARRAYSIZE
+#undef ARRAYSIZE
+#endif
+#define ARRAYSIZE(arr) my_ARRAYSIZE(arr)
+
+/* Include windows.h header file */
+#include <windows.h>
+
+/* Restore the original ERROR and ARRAYSIZE definitions */
+#undef ERROR
+#undef ARRAYSIZE
+#define ERROR 0
+#define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+
+/* Include other necessary header files */
+# include <stdint.h>
+
 
 #include <string.h>
 #include <stdbool.h>
