@@ -39,7 +39,7 @@
 /* Restore the original ERROR and ARRAYSIZE definitions */
 #undef ERROR
 #undef ARRAYSIZE
-#define ERROR 0
+#define ERROR 3
 #define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
 /* Include other necessary header files */
