@@ -12,6 +12,12 @@
  * See <http://www.gnu.org/licenses/>
  */
 
+#ifdef _WIN32
+# include <stdint.h>
+# include <windows.h>
+# define printf(fmt, ...) fprintf(stdout, fmt, ##__VA_ARGS__)
+#endif
+
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -21,13 +27,6 @@
 /* include libmobi header */
 #include <mobi.h>
 #include "common.h"
-
-
-#ifdef _WIN32
-# include <stdint.h>
-# include <windows.h>
-# define printf(fmt, ...) fprintf(stdout, fmt, ##__VA_ARGS__)
-#endif
 
 
 /* miniz file is needed for EPUB creation */
