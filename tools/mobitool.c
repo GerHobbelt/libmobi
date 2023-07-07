@@ -26,6 +26,7 @@
 #ifdef _WIN32
 # include <stdint.h>
 # include <windows.h>
+# define printf(fmt, ...) fprintf(stdout, fmt, ##__VA_ARGS__)
 #endif
 
 
