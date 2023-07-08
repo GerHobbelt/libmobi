@@ -112,6 +112,38 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
+
+// ----------------------------------------
+int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int utf8_len)
+{
+    int len = MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, NULL, 0);
+    if (len == 0) {
+        return -1;
+    }
+    wchar_t* wstr = (wchar_t*)malloc(len * sizeof(wchar_t));
+    if (MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, wstr, len) == 0) {
+        free(wstr);
+        return -1;
+    }
+    len = WideCharToMultiByte(CP_UTF8, 0, wstr, len, NULL, 0, NULL, NULL);
+    if (len == 0) {
+        free(wstr);
+        return -1;
+    }
+    if (len + 1 > utf8_len) {
+        free(wstr);
+        return -1;
+    }
+    if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, utf8_str, len + 1, NULL, NULL) == 0) {
+        free(wstr);
+        return -1;
+    }
+    free(wstr);
+    return len;
+}
+
+
+
 /**
  @brief Print all loaded headers meta information
  @param[in] m MOBIData structure
@@ -413,13 +445,21 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     printf("Saving cover to %s\n", cover_path);
 
 #ifdef _WIN32
-    // 获取当前进程 ID
-    uint32_t pid = GetCurrentProcessId();
-    printf("Process ID: %u\n", pid);
+    char gb2312_str[] = "\xD5\xF5\xD6\xB5\xB9\xDC\xC0\xED\xB1\xEA\xD7\xBC\x5F\x63\x6F\x76\x65\x72\x2E\x6A\x70\x67";
+    printf("Original string: %s\n", gb2312_str);
+    printf("String length: %d\n", sizeof(gb2312_str) - 1); // 不包括字符串末尾的 null 字符
 
-    // 获取当前进程句柄
-    HANDLE handle = GetCurrentProcess();
-    printf("Process handle: %p\n", handle);
+    // 将 GB2312 编码的字符串转换成 UTF-8 编码的字符串
+    char utf8_str[1024];
+    int utf8_len = sizeof(utf8_str);
+    int ret = gb2312_to_utf8(gb2312_str, sizeof(gb2312_str) - 1, utf8_str, utf8_len);
+    if (ret == -1) {
+        printf("Error: the buffer for UTF-8 string is too small!\n");
+	return write_file(record->data, record->size, cover_path);
+        //return -1;
+    }
+    utf8_str[ret] = '\0';
+    printf("UTF-8 string: %s\n", utf8_str);
 #endif
 	
     return write_file(record->data, record->size, cover_path);
