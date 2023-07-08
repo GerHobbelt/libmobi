@@ -18,22 +18,22 @@
 #pragma warning(disable:4005)
 #endif
 
+#ifdef _WIN32
 /* Include windows.h header file */
-#include <windows.h>
+# include <windows.h>
 
-/* Replace ERROR and ARRAYSIZE in common.h */
-#ifdef ERROR
-#undef ERROR
+/* Disable ERROR and ARRAYSIZE in common.h */
+# ifdef ERROR
+# undef ERROR
+# endif
+
+# ifdef ARRAYSIZE
+# undef ARRAYSIZE
+# endif
 #endif
-
-#ifdef ARRAYSIZE
-#undef ARRAYSIZE
-#endif
-
 
 /* Include other necessary header files */
 # include <stdint.h>
-
 
 #include <string.h>
 #include <stdbool.h>
@@ -112,37 +112,7 @@ char *pid = NULL;
 char *serial = NULL;
 #endif
 
-
-// ----------------------------------------
-int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int utf8_len)
-{
-    int len = MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, NULL, 0);
-    if (len == 0) {
-        return -1;
-    }
-    wchar_t* wstr = (wchar_t*)malloc(len * sizeof(wchar_t));
-    if (MultiByteToWideChar(CP_ACP, 0, gb2312_str, gb2312_len, wstr, len) == 0) {
-        free(wstr);
-        return -1;
-    }
-    len = WideCharToMultiByte(CP_UTF8, 0, wstr, len, NULL, 0, NULL, NULL);
-    if (len == 0) {
-        free(wstr);
-        return -1;
-    }
-    if (len + 1 > utf8_len) {
-        free(wstr);
-        return -1;
-    }
-    if (WideCharToMultiByte(CP_UTF8, 0, wstr, -1, utf8_str, len + 1, NULL, NULL) == 0) {
-        free(wstr);
-        return -1;
-    }
-    free(wstr);
-    return len;
-}
-
-
+#ifdef _WIN32
 int convert_to_utf8(const char* input_str, char** output_str)
 {
     // 获取系统的默认代码页
@@ -190,7 +160,7 @@ int convert_to_utf8(const char* input_str, char** output_str)
         return strlen(*output_str);
     }
 }
-
+#endif
 
 /**
  @brief Print all loaded headers meta information
@@ -490,25 +460,8 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
         return ERROR;
     }
     
-    printf("Saving cover to %s\n", cover_path);
 
 #ifdef _WIN32
-    //char gb2312_str[] = "\xD5\xF5\xD6\xB5\xB9\xDC\xC0\xED\xB1\xEA\xD7\xBC\x5F\x63\x6F\x76\x65\x72\x2E\x6A\x70\x67";
-    //printf("Original string: %s\n", gb2312_str);
-
-    // 将 GB2312 编码的字符串转换成 UTF-8 编码的字符串
-    char utf8_str[1024];
-    int utf8_len = sizeof(utf8_str);
-    int ret = gb2312_to_utf8(cover_path, sizeof(cover_path) - 1, utf8_str, utf8_len);
-    if (ret == -1) {
-        printf("Error: the buffer for UTF-8 string is too small!\n");
-	return write_file(record->data, record->size, cover_path);
-        //return -1;
-    }
-    utf8_str[ret] = '\0';
-    printf("UTF-8 string: %s\n", utf8_str);
-
-	
     char* output_str = NULL;
 
     // 将输入字符串转换为 UTF-8 编码后输出
@@ -517,9 +470,8 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
         printf("Saving cover to %s\n", output_str);
         free(output_str);
     }
-
-
-	
+#else
+    printf("Saving cover to %s\n", cover_path);	
 #endif
 	
     return write_file(record->data, record->size, cover_path);
