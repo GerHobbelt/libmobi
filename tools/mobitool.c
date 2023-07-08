@@ -143,6 +143,54 @@ int gb2312_to_utf8(const char* gb2312_str, int gb2312_len, char* utf8_str, int u
 }
 
 
+int convert_to_utf8(const char* input_str, char** output_str)
+{
+    // 获取系统的默认代码页
+    UINT code_page = GetACP();
+    char input_encoding[10];
+    sprintf(input_encoding, "CP%d", code_page);
+
+    // 创建一个临时字符串来存储输入字符串
+    char* temp_str = (char*)malloc((strlen(input_str) + 1) * sizeof(char));
+    strcpy(temp_str, input_str);
+
+    // 如果系统默认代码页不是 UTF-8，则将输入字符串转换为 UTF-8 编码后输出
+    if (code_page != CP_UTF8) {
+        // 尝试将输入字符串解释为 Unicode 编码的字符串
+        int unicode_len = MultiByteToWideChar(code_page, 0, temp_str, -1, NULL, 0);
+        wchar_t* unicode_str = (wchar_t*)malloc(unicode_len * sizeof(wchar_t));
+        if (MultiByteToWideChar(code_page, 0, temp_str, -1, unicode_str, unicode_len) == 0) {
+            free(unicode_str);
+            free(temp_str);
+            printf("Failed to convert input string to Unicode encoding.\n");
+            return 0;
+        }
+
+        // 将 Unicode 编码的字符串从宽字符字符串转换为普通的字符字符串
+        int output_len = WideCharToMultiByte(CP_UTF8, 0, unicode_str, -1, NULL, 0, NULL, NULL);
+        *output_str = (char*)malloc(output_len * sizeof(char));
+        if (WideCharToMultiByte(CP_UTF8, 0, unicode_str, -1, *output_str, output_len, NULL, NULL) == 0) {
+            free(unicode_str);
+            free(temp_str);
+            free(*output_str);
+            printf("Failed to convert input string to UTF-8 encoding.\n");
+            return 0;
+        }
+
+        // 释放内存
+        free(unicode_str);
+
+        return output_len;
+    }
+    // 否则直接输出输入字符串
+    else {
+        *output_str = (char*)malloc((strlen(temp_str) + 1) * sizeof(char));
+        strcpy(*output_str, temp_str);
+        free(temp_str);
+        return strlen(*output_str);
+    }
+}
+
 
 /**
  @brief Print all loaded headers meta information
@@ -459,6 +507,19 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     }
     utf8_str[ret] = '\0';
     printf("UTF-8 string: %s\n", utf8_str);
+
+	
+    char* output_str = NULL;
+
+    // 将输入字符串转换为 UTF-8 编码后输出
+    int output_len = convert_to_utf8(cover_path, &output_str);
+    if (output_len > 0) {
+        printf("Saving cover to %s\n", output_str);
+        free(output_str);
+    }
+
+
+	
 #endif
 	
     return write_file(record->data, record->size, cover_path);
