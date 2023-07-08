@@ -18,29 +18,18 @@
 #pragma warning(disable:4005)
 #endif
 
-/* Define my_ERROR and my_ARRAYSIZE to replace ERROR and ARRAYSIZE */
-#define my_ERROR 1
-#define my_ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+/* Include windows.h header file */
+#include <windows.h>
 
 /* Replace ERROR and ARRAYSIZE in common.h */
 #ifdef ERROR
 #undef ERROR
 #endif
-#define ERROR my_ERROR
 
 #ifdef ARRAYSIZE
 #undef ARRAYSIZE
 #endif
-#define ARRAYSIZE(arr) my_ARRAYSIZE(arr)
 
-/* Include windows.h header file */
-#include <windows.h>
-
-/* Restore the original ERROR and ARRAYSIZE definitions */
-#undef ERROR
-#undef ARRAYSIZE
-#define ERROR 3
-#define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
 /* Include other necessary header files */
 # include <stdint.h>
