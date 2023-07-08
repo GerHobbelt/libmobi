@@ -445,13 +445,13 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
     printf("Saving cover to %s\n", cover_path);
 
 #ifdef _WIN32
-    char gb2312_str[] = "\xD5\xF5\xD6\xB5\xB9\xDC\xC0\xED\xB1\xEA\xD7\xBC\x5F\x63\x6F\x76\x65\x72\x2E\x6A\x70\x67";
-    printf("Original string: %s\n", gb2312_str);
+    //char gb2312_str[] = "\xD5\xF5\xD6\xB5\xB9\xDC\xC0\xED\xB1\xEA\xD7\xBC\x5F\x63\x6F\x76\x65\x72\x2E\x6A\x70\x67";
+    //printf("Original string: %s\n", gb2312_str);
 
     // 将 GB2312 编码的字符串转换成 UTF-8 编码的字符串
     char utf8_str[1024];
     int utf8_len = sizeof(utf8_str);
-    int ret = gb2312_to_utf8(gb2312_str, sizeof(gb2312_str) - 1, utf8_str, utf8_len);
+    int ret = gb2312_to_utf8(cover_path, sizeof(cover_path) - 1, utf8_str, utf8_len);
     if (ret == -1) {
         printf("Error: the buffer for UTF-8 string is too small!\n");
 	return write_file(record->data, record->size, cover_path);
