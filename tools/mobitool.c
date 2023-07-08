@@ -447,7 +447,6 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
 #ifdef _WIN32
     char gb2312_str[] = "\xD5\xF5\xD6\xB5\xB9\xDC\xC0\xED\xB1\xEA\xD7\xBC\x5F\x63\x6F\x76\x65\x72\x2E\x6A\x70\x67";
     printf("Original string: %s\n", gb2312_str);
-    printf("String length: %d\n", sizeof(gb2312_str) - 1); // 不包括字符串末尾的 null 字符
 
     // 将 GB2312 编码的字符串转换成 UTF-8 编码的字符串
     char utf8_str[1024];
