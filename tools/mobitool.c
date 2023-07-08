@@ -12,17 +12,10 @@
  * See <http://www.gnu.org/licenses/>
  */
 
-#ifdef _MSC_VER
-/* Disable warnings for redefining macros in Windows headers */
-#pragma warning(push)
-#pragma warning(disable:4005)
-#endif
-
 #ifdef _WIN32
-/* Include windows.h header file */
 # include <windows.h>
 
-/* Disable ERROR and ARRAYSIZE in common.h */
+/* Disable ERROR and ARRAYSIZE in windows.h, redefined in common.h */
 # ifdef ERROR
 # undef ERROR
 # endif
@@ -115,18 +108,18 @@ char *serial = NULL;
 #ifdef _WIN32
 int convert_to_utf8(const char* input_str, char** output_str)
 {
-    // 获取系统的默认代码页
+    // Get the default code page of the system
     UINT code_page = GetACP();
     char input_encoding[10];
     sprintf(input_encoding, "CP%d", code_page);
 
-    // 创建一个临时字符串来存储输入字符串
+    // Create a temporary string to store the input string
     char* temp_str = (char*)malloc((strlen(input_str) + 1) * sizeof(char));
     strcpy(temp_str, input_str);
 
-    // 如果系统默认代码页不是 UTF-8，则将输入字符串转换为 UTF-8 编码后输出
+    // If the default code page of the system is not UTF-8, convert the input string to UTF-8 encoding
     if (code_page != CP_UTF8) {
-        // 尝试将输入字符串解释为 Unicode 编码的字符串
+        // Try to interpret the input string as a Unicode-encoded string
         int unicode_len = MultiByteToWideChar(code_page, 0, temp_str, -1, NULL, 0);
         wchar_t* unicode_str = (wchar_t*)malloc(unicode_len * sizeof(wchar_t));
         if (MultiByteToWideChar(code_page, 0, temp_str, -1, unicode_str, unicode_len) == 0) {
@@ -136,7 +129,7 @@ int convert_to_utf8(const char* input_str, char** output_str)
             return 0;
         }
 
-        // 将 Unicode 编码的字符串从宽字符字符串转换为普通的字符字符串
+        // Convert the Unicode-encoded string from a wide-character string to a regular character string
         int output_len = WideCharToMultiByte(CP_UTF8, 0, unicode_str, -1, NULL, 0, NULL, NULL);
         *output_str = (char*)malloc(output_len * sizeof(char));
         if (WideCharToMultiByte(CP_UTF8, 0, unicode_str, -1, *output_str, output_len, NULL, NULL) == 0) {
@@ -147,12 +140,12 @@ int convert_to_utf8(const char* input_str, char** output_str)
             return 0;
         }
 
-        // 释放内存
+        // Free memory
         free(unicode_str);
 
         return output_len;
     }
-    // 否则直接输出输入字符串
+    // Otherwise, output the input string directly
     else {
         *output_str = (char*)malloc((strlen(temp_str) + 1) * sizeof(char));
         strcpy(*output_str, temp_str);
@@ -460,11 +453,9 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
         return ERROR;
     }
     
-
 #ifdef _WIN32
     char* output_str = NULL;
-
-    // 将输入字符串转换为 UTF-8 编码后输出
+    // Convert to UTF-8 encoding
     int output_len = convert_to_utf8(cover_path, &output_str);
     if (output_len > 0) {
         printf("Saving cover to %s\n", output_str);
