@@ -378,7 +378,6 @@ void mobi_free_part(MOBIPart *part, int free_data) {
         curr = curr->next;
         if (free_data) { free(tmp->data); }
         free(tmp);
-        tmp = NULL;
     }
     part = NULL;
 }
@@ -441,5 +440,4 @@ void mobi_free_rawml(MOBIRawml *rawml) {
     free(rawml);
     rawml = NULL;
 }
-
 
