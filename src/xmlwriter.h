@@ -16,7 +16,7 @@
 #include "structure.h"
 
 #define BAD_CAST (xmlChar *)
-#define LIBXML_TEST_VERSION
+#define LIBXML_TEST_VERSION()
 
 #define xmlCleanupParser()
 

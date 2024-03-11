@@ -1900,7 +1900,7 @@ void mobi_free_opf(OPF *opf) {
 MOBI_RET mobi_build_opf(MOBIRawml *rawml, const MOBIData *m) {
     debug_print("Reconstructing opf%s", "\n");
     /* initialize libXML2 */
-    LIBXML_TEST_VERSION
+    LIBXML_TEST_VERSION();
     /* initialize OPF structure */
     OPF opf = {
         .metadata = NULL,
