@@ -16,9 +16,10 @@
 #include "structure.h"
 
 #define BAD_CAST (xmlChar *)
-#define LIBXML_TEST_VERSION()
 
-#define xmlCleanupParser()
+//#define LIBXML_TEST_VERSION()
+
+//#define xmlCleanupParser()
 
 typedef unsigned char xmlChar;
 
