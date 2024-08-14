@@ -7,57 +7,6 @@ on:
     branches: [ public ]
 
 jobs:
-  unix-build:
-
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          - name: default build with debug
-            options: --enable-debug
-          - name: bulid with internal libs
-            options: --with-zlib=no --with-libxml2=no
-          - name: build without encryption
-            options: --disable-encryption
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: install dependencies
-      run: |
-        if [ "${{ runner.os }}" = "Linux" ]; then
-          sudo apt-get update -qq;
-          sudo apt-get install -y autotools-dev pkg-config automake autoconf libtool;
-          sudo apt-get install -y zlib1g-dev libxml2-dev;
-        elif [ "${{ runner.os }}" = "macOS" ]; then
-          brew update > /dev/null;
-          brew outdated autoconf || brew upgrade autoconf;
-          brew outdated automake || brew upgrade automake;
-          brew outdated libtool || brew upgrade libtool;
-        fi
-    - name: autogen
-      run: ./autogen.sh
-    - name: configure
-      run: ./configure ${{ matrix.config.options }}
-    - name: make
-      run: make -j `nproc`
-    - name: make check
-      run: make -j `nproc` check
-    - name: make distcheck
-      run: make -j `nproc` distcheck
-    - name: upload debug artifacts
-      uses: actions/upload-artifact@v2
-      if: ${{ failure() }}
-      with:
-        name: test-logs
-        path: |
-          **/tests/test-suite.log
-          **/tests/samples/*.log
-
   win64-build:
 
     runs-on: windows-latest
@@ -87,15 +36,80 @@ jobs:
       run: ./configure --enable-debug
     - name: make
       run: make -j$(nproc)
+
+    - name: Tag the repository
+      id: tag
+      run: |
+        git config --global user.email "taobao2012id1@163.com"
+        git config --global user.name "CuteLicense"
+        #TAG=v$(date -Iseconds | sed 's/[T:\+]/-/g')
+        TAG=v$(TZ=UTC-8 date +%F_%T | sed 's/-//g' | sed 's/[T:\+]//g')
+        echo "$TAG"
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+        git tag -a $TAG -m "Published version $TAG" ${GITHUB_SHA}
+        git push origin $TAG
+
+    - name: Get Latest Tag
+      id: latest_tag
+      uses: WyriHaximus/github-action-get-previous-tag@v1
+
+    - name: Echo latest tag
+      run: echo '${{ steps.latest_tag.outputs.tag }}'
+      
     - name: make check
       run: make -j$(nproc) check
+      
     - name: make distcheck
       run: make -j$(nproc) distcheck
+
+    - name: create release folder
+      run: mkdir release
+
+    - name: copy dll file
+      run:  cp src/.libs/*.dll release/
+
+    - name: copy exe files
+      run:  cp tools/.libs/*.exe release/
+
+    - name: Compress binaries
+      uses: svenstaro/upx-action@v2
+      with:
+        files: |
+          /release/*
+          **/release/*
+
+    - name: Zip Files
+      uses: vimtor/action-zip@v1
+      with:
+        files: release/
+        dest: ${{ steps.latest_tag.outputs.tag }}.zip
+
+    - name: List results
+      run:  ls -R |awk '{print i$0}' i=`pwd`'/'
+      
+    - name: Upload release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # if: startsWith(github.ref, 'refs/tags/')
+      with:
+        tag_name: ${{ steps.latest_tag.outputs.tag }}
+        fail_on_unmatched_files: true
+        generate_release_notes: false
+        name: libmobi-${{ steps.latest_tag.outputs.tag }}
+        files: |
+          **/*.zip
+          **/release/*.dll
+          **/release/*.exe
+
     - name: upload debug artifacts
       uses: actions/upload-artifact@v2
       if: ${{ failure() }}
       with:
-        name: test-logs
+        name: debug-release
         path: |
-          **/tests/test-suite.log
-          **/tests/samples/*.log
+          **/*.dll
+          **/tools/.libs/*.exe
+          **/tools/*.dll
+          #**/tests/test-suite.log
+          #**/tests/samples/*.log

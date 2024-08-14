@@ -12,6 +12,22 @@
  * See <http://www.gnu.org/licenses/>
  */
 
+#ifdef _WIN32
+# include <windows.h>
+
+/* Disable ERROR and ARRAYSIZE in windows.h, redefined in common.h */
+# ifdef ERROR
+# undef ERROR
+# endif
+
+# ifdef ARRAYSIZE
+# undef ARRAYSIZE
+# endif
+#endif
+
+/* Include other necessary header files */
+# include <stdint.h>
+
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -86,6 +102,56 @@ bool setserial_opt = false;
 #ifdef USE_ENCRYPTION
 char *pid = NULL;
 char *serial = NULL;
+#endif
+
+#ifdef _WIN32
+int convert_to_utf8(const char* input_str, char** output_str)
+{
+    // Get the default code page of the system
+    UINT code_page = GetACP();
+    char input_encoding[10];
+    sprintf(input_encoding, "CP%d", code_page);
+
+    // Create a temporary string to store the input string
+    char* temp_str = (char*)malloc((strlen(input_str) + 1) * sizeof(char));
+    strcpy(temp_str, input_str);
+
+    // If the default code page of the system is not UTF-8, convert the input string to UTF-8 encoding
+    if (code_page != CP_UTF8) {
+        // Try to interpret the input string as a Unicode-encoded string
+        int unicode_len = MultiByteToWideChar(code_page, 0, temp_str, -1, NULL, 0);
+        wchar_t* unicode_str = (wchar_t*)malloc(unicode_len * sizeof(wchar_t));
+        if (MultiByteToWideChar(code_page, 0, temp_str, -1, unicode_str, unicode_len) == 0) {
+            free(unicode_str);
+            free(temp_str);
+            printf("Failed to convert input string to Unicode encoding.\n");
+            return 0;
+        }
+
+        // Convert the Unicode-encoded string from a wide-character string to a regular character string
+        int output_len = WideCharToMultiByte(CP_UTF8, 0, unicode_str, -1, NULL, 0, NULL, NULL);
+        *output_str = (char*)malloc(output_len * sizeof(char));
+        if (WideCharToMultiByte(CP_UTF8, 0, unicode_str, -1, *output_str, output_len, NULL, NULL) == 0) {
+            free(unicode_str);
+            free(temp_str);
+            free(*output_str);
+            printf("Failed to convert input string to UTF-8 encoding.\n");
+            return 0;
+        }
+
+        // Free memory
+        free(unicode_str);
+
+        return output_len;
+    }
+    // Otherwise, output the input string directly
+    else {
+        *output_str = (char*)malloc((strlen(temp_str) + 1) * sizeof(char));
+        strcpy(*output_str, temp_str);
+        free(temp_str);
+        return strlen(*output_str);
+    }
+}
 #endif
 
 /**
@@ -386,8 +452,18 @@ static int dump_cover(const MOBIData *m, const char *fullpath) {
         return ERROR;
     }
     
-    printf("Saving cover to %s\n", cover_path);
-    
+#ifdef _WIN32
+    char* output_str = NULL;
+    // Convert to UTF-8 encoding
+    int output_len = convert_to_utf8(cover_path, &output_str);
+    if (output_len > 0) {
+        printf("Saving cover to %s\n", output_str);
+        free(output_str);
+    }
+#else
+    printf("Saving cover to %s\n", cover_path);	
+#endif
+	
     return write_file(record->data, record->size, cover_path);
 }
 
@@ -931,6 +1007,11 @@ static void exit_with_usage(const char *progname) {
  @return SUCCESS (0) or ERROR (1)
  */
 int main(int argc, char *argv[]) {
+
+#ifdef _WIN32
+    system("chcp 65001>nul");
+#endif
+	
     if (argc < 2) {
         exit_with_usage(argv[0]);
     }
