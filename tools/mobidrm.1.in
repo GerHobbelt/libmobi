@@ -28,7 +28,7 @@ library.
 It may encrypt documents targeting particular device by using its serial number or applying generic DRM scheme targeting all supported readers.
 .Pp
 Optionally encryption may be valid only during chosen period. Kindles require both start and end date to be set.
-This tool allows to specify only one date (start or end).
+This tool allows one to specify only one date (start or end).
 In such case the other date will be automatically set to respectively lowest (1970-01-01) or largest (10136-02-16) valid value.
 .Pp
 In case of hybrid files mobidrm separately encrypts both enclosed parts and produces two files: mobi for legacy format and azw3 for KF8 format.
@@ -98,7 +98,7 @@ The following command encrypts document targeting two devices using their serial
 .Pp
 .Dl % mobidrm -e -s B001XXXXXXXXXX01 -s B001XXXXXXXXXX02 example.mobi
 .Pp
-The following command encrypts document for device wth given serial number. Document will only be valid within given period (inclusive).
+The following command encrypts document for device with given serial number. Document will only be valid within given period (inclusive).
 .Pp
 .Dl % mobidrm -e -s B001XXXXXXXXXX01 -f 2021-01-01 -t 2021-01-31 example.mobi
 .Sh RETURN VALUES

@@ -1,3 +1,5 @@
+2024-07-04: Minor rewording in man page
+2024-06-17: Fix typo
 2024-06-17: Version 0.12
 2024-02-04: Fix: missing header with libxml2 >= 2.12
 2024-02-04: Max index count value is too low for some dictionaries
