@@ -26,7 +26,7 @@ jobs:
             options: --disable-encryption
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: install dependencies
       run: |
         if [ "${{ runner.os }}" = "Linux" ]; then
@@ -50,10 +50,10 @@ jobs:
     - name: make distcheck
       run: make -j `nproc` distcheck
     - name: upload debug artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: ${{ failure() }}
       with:
-        name: test-logs
+        name: test-logs-${{ matrix.runs-on }}
         path: |
           **/tests/test-suite.log
           **/tests/samples/*.log
@@ -80,7 +80,7 @@ jobs:
           mingw-w64-x86_64-libxml2
           mingw-w64-x86_64-zlib
     - name: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: autogen
       run: sh ./autogen.sh
     - name: configure
@@ -92,10 +92,10 @@ jobs:
     - name: make distcheck
       run: make -j$(nproc) distcheck
     - name: upload debug artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: ${{ failure() }}
       with:
-        name: test-logs
+        name: test-logs-${{ matrix.runs-on }}
         path: |
           **/tests/test-suite.log
           **/tests/samples/*.log
